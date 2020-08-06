@@ -30,4 +30,27 @@ app.get('/pyecho', (req,res) => {
   })
 })
 
+app.post('/flux', (req,res) => {
+
+  console.warn(req.query)
+  
+  exec(`python3 ${process.cwd()}/scripts/luxed.py ${(req.query.ct + ' ' + req.query.bri) ?? ''}`, (error, stdout, stderr) => {
+    if(error){
+      console.error('ERROR', error)
+      res.status(500).send({
+        message: error.message,
+        ...error
+      })
+      return
+    }
+    if(stderr){
+      console.error('PYERROR', error)
+      res.status(400).send(stderr)
+      return
+    }
+    res.send(stdout)
+  })
+    
+})
+
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))

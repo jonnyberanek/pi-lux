@@ -1,5 +1,8 @@
 # Modules
 node_modules/
 
-## dist directory
+# dist directory
 server/dist/
+
+# all pycaches
+**/__pycache__
