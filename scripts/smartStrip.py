@@ -1,6 +1,12 @@
 from stripConfig import init
 import time
 
+BRIGHT_MAX = 255.0
+BRIGHT_MOD = 115.0
+
+def toneDown(bit, warmth):
+  return bit - ((1 - bit/BRIGHT_MAX * (warmth-1900)/4100.0) * BRIGHT_MOD)
+
 def safeColor(val):
   return min(max(0,int(val)),255)
   
@@ -8,11 +14,12 @@ def lerp(v0, v1, t):
   return (1 - t) * v0 + t * v1;
 
 def warmthToRBG(warmth):
-  b = 214/4100 * warmth - 59
-  g = 108/4100 * warmth + 96
+  print(type(warmth))
+  b = toneDown(214/4100 * warmth - 59.0, warmth)
+  g = toneDown(108/4100 * warmth + 95.0, warmth)
   print(safeColor(b))
   print(safeColor(g))
-  return (255, safeColor(b), safeColor(g)) 
+  return (safeColor(toneDown(255, warmth)), safeColor(b), safeColor(g))
 
 class SmartStrip:
   def __init__(self):
