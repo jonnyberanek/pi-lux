@@ -10,7 +10,7 @@ from tcp_server import TCPServerThread
 global looper_thread
 looperThread = None
 
-
+PORT = 4063
 
 class Lux():
 
@@ -38,14 +38,14 @@ class Lux():
     return LuxTCPHandler
 
   def __init__(self):
-    self.server_thread = TCPServerThread(("localhost", 8011), self.makeTcpHandler())
+    self.server_thread = TCPServerThread(("localhost", PORT), self.makeTcpHandler())
     self.looper_thread = EventLoopThread()
 
   def start(self):
     print('Starting...')
     try:
       self.server_thread.start()
-      print('Server listening at localhost:9999')
+      print('Server listening at localhost:{}'.format(PORT))
       self.looper_thread.start()
       print('Looper thread is ready!')
       while True: time.sleep(99)

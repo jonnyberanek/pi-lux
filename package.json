@@ -7,13 +7,15 @@
     "start": "nodemon --exec babel-node httpserver/src",
     "build": "babel server --out-file server/dist/index.js",
     "serve": "node server/dist",
-    "start:all": "concurrently \"python3 socketserver/server.py\" \"npm:start\""
+    "start:all": "concurrently \"python3 socketserver/server.py\" \"npm:start\" \"cd client & npm start\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@babel/polyfill": "^7.10.4",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1"
   },
   "devDependencies": {

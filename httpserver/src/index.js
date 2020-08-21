@@ -1,8 +1,14 @@
 import express from 'express'
 import {exec} from 'child_process'
+import net from 'net'
+import cors from 'cors'
+import bodyParser from 'body-parser'
 
 const app = express()
-const port = 3000
+const port = 4061
+
+app.use(cors())
+app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
   try{
@@ -51,6 +57,19 @@ app.post('/flux', (req,res) => {
     res.send(stdout)
   })
     
+})
+
+app.post('/testnet', (req, res) => {
+  const socket = net.createConnection(4063,'localhost', () => {
+    try{
+      socket.write(JSON.stringify(req.body))
+      res.send()
+    } catch(e){
+      res.status(500).send(e)
+    } finally {
+      socket.destroy()
+    }
+  })
 })
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
