@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node server/src",
+    "start": "nodemon --exec babel-node httpserver/src",
     "build": "babel server --out-file server/dist/index.js",
-    "serve": "node server/dist"
+    "serve": "node server/dist",
+    "start:all": "concurrently \"python3 socketserver/server.py\" \"npm:start\""
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.11.0",
     "babel-preset-env": "^1.7.0",
+    "concurrently": "^5.3.0",
     "nodemon": "^2.0.4"
   }
 }
