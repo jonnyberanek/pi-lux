@@ -38,7 +38,7 @@ class Lux():
     return LuxTCPHandler
 
   def __init__(self):
-    self.server_thread = TCPServerThread(("localhost", 9999), self.makeTcpHandler())
+    self.server_thread = TCPServerThread(("localhost", 8011), self.makeTcpHandler())
     self.looper_thread = EventLoopThread()
 
   def start(self):
