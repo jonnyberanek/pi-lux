@@ -2,7 +2,7 @@
 node_modules/
 
 # dist directory
-server/dist/
+**/dist/
 
 # all pycaches
 **/__pycache__
