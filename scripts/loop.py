@@ -23,4 +23,4 @@ def colorLoop(colors, interval=3):
         strip.fill(color)
         time.sleep(0.02)
 
-colorLoop([(160,255,160), (160,160,255), (255,160,160)], 2)
+colorLoop([(255,0,0), (230,160,0), (255,0,0), (255,40,160)], 3)

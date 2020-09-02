@@ -31,6 +31,7 @@ class Lux():
         data = json.loads(self.request.recv(1024).strip().decode('utf-8'))
         print("{} wrote:".format(self.client_address[0]))
         print(json.dumps(data, indent=4))
+        print(data.get("color"))
         parent.looper_thread.setNextCommand(data)
         # just send back the same data, but upper-cased
         self.request.sendall(b'Received')

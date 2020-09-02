@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exec babel-node httpserver/src",
-    "build": "babel server --out-file server/dist/index.js",
-    "serve": "node server/dist",
+    "build": "babel httpserver --out-file httpserver/dist/index.js",
+    "serve": "node httpserver/dist",
     "start:all": "concurrently \"python3 socketserver/server.py\" \"npm:start\" \"cd client & npm start\""
   },
   "keywords": [],
@@ -19,6 +19,7 @@
     "express": "^4.17.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.10.5",
     "@babel/core": "^7.11.0",
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.11.0",

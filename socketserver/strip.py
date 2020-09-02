@@ -1,5 +1,18 @@
-from stripConfig import init
+import board
+import adafruit_ws2801
 import time
+
+odata = board.MOSI
+oclock = board.SCLK
+numleds = 160
+bright = 1.0
+
+### Example for a Feather M4 driving 25 12mm leds
+def init():
+  return adafruit_ws2801.WS2801(
+    oclock, odata, numleds, brightness=bright, auto_write=False
+  )
+
 
 BRIGHT_MAX = 255.0
 BRIGHT_MOD = 118.0
@@ -21,7 +34,7 @@ def warmthToRBG(warmth):
   print(safeColor(g))
   return (safeColor(toneDown(255, warmth)), safeColor(b), safeColor(g))
 
-class SmartStrip:
+class Strip:
   def __init__(self):
     self.pixels = init()
   
