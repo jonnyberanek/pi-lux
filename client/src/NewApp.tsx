@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import logo from './triangle.svg';
 import './App.css';
 import RgbSlider, {colorSubject} from './RgbSlider'

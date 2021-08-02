@@ -1,4 +1,4 @@
-import React, { useReducer, SyntheticEvent, Reducer, Props } from "react";
+import { useReducer, SyntheticEvent, Reducer } from "react";
 import { BehaviorSubject } from "rxjs";
 import { throttleTime } from "rxjs/operators";
 import "./style.css";
