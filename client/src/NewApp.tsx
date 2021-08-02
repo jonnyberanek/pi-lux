@@ -16,7 +16,7 @@ throttledColorSubject.subscribe({
     // console.log(c)
     let res
     try{
-      res = await axios.post('http://192.168.1.223:4061/testnet', {
+      res = await axios.post('http://192.168.0.175:4061/testnet', {
         color: c
       }, {
 
