@@ -4,11 +4,11 @@ import { useCallback, useEffect } from 'react'
 import { throttleTime } from 'rxjs/operators'
 import './App.css'
 import { colorSubject, RgbColor } from './RgbSlider'
-import BaseRouter from './router'
-import TabBar from './TabBar'
-import logo from './triangle.svg'
+import BaseRouter from './routing/router'
+import logo from './assets/triangle.svg'
 import { makeFilter } from './util/color'
 import { useObservableValue } from './util/rxjs'
+import TabBar from './routing/TabBar'
 
 const throttledColorSubject = colorSubject.pipe(
   throttleTime(200, undefined, { leading: true, trailing: true })
@@ -40,6 +40,17 @@ function App() {
     return () => sub.unsubscribe()
   })
 
+  const tabs = [
+    {
+      label: 'Solid',
+      path: 'slider',
+    },
+    {
+      label: 'Scripts',
+      path: 'scripts',
+    },
+  ]
+
   return (
     <div className="App">
       <header
@@ -58,16 +69,7 @@ function App() {
         />
         <br />
         <TabBar
-          tabs={[
-            {
-              label: 'Solid',
-              path: 'slider',
-            },
-            {
-              label: 'Scripts',
-              path: 'scripts',
-            },
-          ]}
+          tabs={tabs}
         />
         <br />
         <BaseRouter />
