@@ -3,9 +3,9 @@ import { BehaviorSubject } from "rxjs";
 import { throttleTime } from "rxjs/operators";
 import "./style.css";
 
-type Color = [number, number, number];
+export type RgbColor = [red: number, green: number, blue: number];
 
-export const colorSubject = new BehaviorSubject<Color>([0, 0, 0]);
+export const colorSubject = new BehaviorSubject<RgbColor>([0, 0, 0]);
 
 export const throttledColorSubject = colorSubject.pipe(
   throttleTime(250, undefined, { leading: true, trailing: true })
@@ -26,12 +26,12 @@ interface Action {
   value: string;
 }
 
-let reducer: Reducer<Color, Action>;
+let reducer: Reducer<RgbColor, Action>;
 
-reducer = (state: Color, { color, value }: Action) => {
+reducer = (state: RgbColor, { color, value }: Action) => {
   const val = parseInt(value, 10);
 
-  const newState: Color = [...state] as Color;
+  const newState: RgbColor = [...state] as RgbColor;
 
   switch (color) {
     case Pixel.RED:
@@ -51,7 +51,7 @@ reducer = (state: Color, { color, value }: Action) => {
 };
 
 export default function RgbSlider({ className } : {className?: string}) {
-  const [color, dispatch] = useReducer<Reducer<Color, Action>>(
+  const [color, dispatch] = useReducer<Reducer<RgbColor, Action>>(
     reducer,
     colorSubject.value
   );
