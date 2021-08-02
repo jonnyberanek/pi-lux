@@ -6,7 +6,7 @@
   height: 40vmin;
   pointer-events: none;
   /* filter: sepia(100%) saturate(380%) hue-rotate(300deg) */
-  filter: brightness(50%)
+  filter: brightness(50%);
 }
 
 @media (prefers-reduced-motion: no-preference) {

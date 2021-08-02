@@ -1,5 +1,5 @@
-import './App.css';
-import logo from './triangle.svg';
+import './App.css'
+import logo from './triangle.svg'
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         </a>
       </header>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

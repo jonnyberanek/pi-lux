@@ -1,68 +1,70 @@
-import { useReducer, SyntheticEvent, Reducer } from "react";
-import { BehaviorSubject } from "rxjs";
-import { throttleTime } from "rxjs/operators";
-import "./style.css";
+import { useReducer, SyntheticEvent, Reducer } from 'react'
+import { BehaviorSubject } from 'rxjs'
+import { throttleTime } from 'rxjs/operators'
+import './style.css'
 
-export type RgbColor = [red: number, green: number, blue: number];
+export type RgbColor = [red: number, green: number, blue: number]
 
-export const colorSubject = new BehaviorSubject<RgbColor>([0, 0, 0]);
+export const colorSubject = new BehaviorSubject<RgbColor>([0, 0, 0])
 
 export const throttledColorSubject = colorSubject.pipe(
   throttleTime(250, undefined, { leading: true, trailing: true })
-);
+)
 
-function Slider(props:any) {
-  return <input type="range" min={0} max={255} {...props} />;
+function Slider(props: any) {
+  return <input type="range" min={0} max={255} {...props} />
 }
 
 enum Pixel {
   RED,
   GREEN,
-  BLUE
+  BLUE,
 }
 
 interface Action {
-  color: Pixel;
-  value: string;
+  color: Pixel
+  value: string
 }
 
-let reducer: Reducer<RgbColor, Action>;
+let reducer: Reducer<RgbColor, Action>
 
 reducer = (state: RgbColor, { color, value }: Action) => {
-  const val = parseInt(value, 10);
+  const val = parseInt(value, 10)
 
-  const newState: RgbColor = [...state] as RgbColor;
+  const newState: RgbColor = [...state] as RgbColor
 
   switch (color) {
     case Pixel.RED:
-      newState[0] = val;
-      break;
+      newState[0] = val
+      break
     case Pixel.GREEN:
-      newState[1] = val;
-      break;
+      newState[1] = val
+      break
     case Pixel.BLUE:
-      newState[2] = val;
-      break;
+      newState[2] = val
+      break
   }
 
-  colorSubject.next(newState);
+  colorSubject.next(newState)
 
-  return newState;
-};
+  return newState
+}
 
-export default function RgbSlider({ className } : {className?: string}) {
+export default function RgbSlider({ className }: { className?: string }) {
   const [color, dispatch] = useReducer<Reducer<RgbColor, Action>>(
     reducer,
     colorSubject.value
-  );
+  )
 
-  const dispatchChange = (color: Pixel) => ({ target }: SyntheticEvent) => {
-    // @ts-ignore
-    dispatch({ color, value: target.value });
-  };
+  const dispatchChange =
+    (color: Pixel) =>
+    ({ target }: SyntheticEvent) => {
+      // @ts-ignore
+      dispatch({ color, value: target.value })
+    }
 
   return (
-    <div className={"rgbSlider" + (className ? " " + className : "")}>
+    <div className={'rgbSlider' + (className ? ' ' + className : '')}>
       <Slider
         className="redSlider"
         onChange={dispatchChange(Pixel.RED)}
@@ -79,5 +81,5 @@ export default function RgbSlider({ className } : {className?: string}) {
         value={color[2]}
       />
     </div>
-  );
+  )
 }

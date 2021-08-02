@@ -22,7 +22,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prettify": "prettier --write ."
   },
   "proxy": "http://localhost:4061/",
   "eslintConfig": {
@@ -43,6 +44,7 @@
   "devDependencies": {
     "@types/color": "^3.0.2",
     "@types/react": "^17.0.15",
-    "@types/react-dom": "^17.0.9"
+    "@types/react-dom": "^17.0.9",
+    "prettier": "^2.3.2"
   }
 }
