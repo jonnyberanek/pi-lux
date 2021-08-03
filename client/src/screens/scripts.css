@@ -1,0 +1,47 @@
+.container {
+  color: white;
+  min-width: 50vw;
+  max-height: 33vh;
+  background-color: #202020;
+  border-radius: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  overflow-y: scroll;
+  font-size: 1.6rem;
+}
+
+.script-list {
+
+}
+
+.script-list-item {
+  padding: 24px;
+  padding-top: 8px;
+  padding-bottom: 12px;
+}
+
+.script-list-item:hover{
+  cursor: pointer;
+  background-color: #272727;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #0000;
+  margin: 8px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 100px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

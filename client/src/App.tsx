@@ -17,7 +17,7 @@ const throttledColorSubject = colorSubject.pipe(
 async function sendColorUpdate(c: RgbColor) {
   try {
     await axios.post('http://192.168.0.175:4061/testnet', {
-      color: c,
+      color: [c[0], c[2], c[1]],
     })
   } catch (e) {
     console.log(e.request, e.response)
@@ -68,9 +68,7 @@ function App() {
           }}
         />
         <br />
-        <TabBar
-          tabs={tabs}
-        />
+        <TabBar tabs={tabs} />
         <br />
         <BaseRouter />
       </header>

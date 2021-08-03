@@ -3,19 +3,16 @@ import {exec} from 'child_process'
 import net from 'net'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import { readdirSync } from 'fs'
 
 const app = express()
 const port = 4061
+const SCRIPTS_PATH = './scripts'
 
 app.use(cors())
 app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
-  try{
-
-  } catch(e){
-
-  }
   res.send('hello')
 })
 
@@ -70,6 +67,10 @@ app.post('/testnet', (req, res) => {
       socket.destroy()
     }
   })
+})
+
+app.get('/scripts', (req, res) => {
+  res.send(readdirSync(SCRIPTS_PATH).filter(name => name.endsWith('.py')).map(name => name))
 })
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
