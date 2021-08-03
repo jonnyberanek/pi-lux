@@ -4,6 +4,7 @@ import net from 'net'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import { readdirSync } from 'fs'
+import readArgSchema from './read-args'
 
 const app = express()
 const port = 4061
@@ -70,11 +71,19 @@ app.post('/testnet', (req, res) => {
 })
 
 app.get('/scripts', (req, res) => {
-  res.send(
-    readdirSync(SCRIPTS_PATH)
-      .filter(name => name.endsWith('.py'))
-      .map(name => name)
-  )
+
+  const files = readdirSync(SCRIPTS_PATH)
+    .filter(name => name.endsWith('.py'))
+    .map(name => name)
+
+  const responseData = files.map((name) => {
+    return {
+      name,
+      argSchema: readArgSchema(SCRIPTS_PATH + '/' + name)
+    }
+  })
+  
+  res.send(responseData)
 })
 
 app.post('/scripts/:scriptName/run', (req, res) => {

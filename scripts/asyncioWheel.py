@@ -1,3 +1,33 @@
+""" JSON-ARGS
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "colors": {
+      "type": "array",
+      "items": [
+        {
+          "type": "array",
+          "items": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "colors"
+  ]
+}
+"""
 # wheel.py
 # gradient.py
 import time

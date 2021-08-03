@@ -1,6 +1,6 @@
 import { RouteComponentProps } from '@reach/router'
 import axios from 'axios'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import './scripts.css'
 
 export interface ScriptsScreenProps extends RouteComponentProps {}
@@ -20,35 +20,33 @@ async function runScript(name: string) {
 }
 
 const ScriptsScreen: FC<ScriptsScreenProps> = () => {
-  const [scripts, setScripts] = useState<string[] | string>()
-
-  console.log(scripts)
+  const [scriptData, setScriptData] = useState<{name: string, argSchema: any}[] | string>()
 
   useEffect(() => {
     getScriptsInDir()
       .then(list => {
-        setScripts(list)
+        setScriptData(list)
       })
       .catch(e => {
         console.warn(e.stack)
-        setScripts(e.message)
+        setScriptData(e.message)
       })
   }, [])
 
   return (
     <div className="container">
-      {!scripts ? (
+      {!scriptData ? (
         <div>Loading...</div>
-      ) : typeof scripts === 'string' ? (
-        <div style={{ color: 'red' }}>Error: {scripts}</div>
+      ) : typeof scriptData === 'string' ? (
+        <div style={{ color: 'red' }}>Error: {scriptData}</div>
       ) : (
         <div className='script-list'>
-          {scripts.map(x => (
+          {scriptData.map(x => (
             <div
               className='script-list-item'
-              onClick={() => runScript(x)}
+              onClick={() => runScript(x.name)}
             >
-              {x}
+              {x.name.slice(0,x.name.length-3)}
             </div>
           ))}
         </div>
