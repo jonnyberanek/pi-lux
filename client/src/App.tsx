@@ -1,28 +1,18 @@
-import axios from 'axios'
 import Color from 'color'
 import { useCallback, useEffect } from 'react'
 import { throttleTime } from 'rxjs/operators'
+import { setColor } from './api'
 import './App.css'
-import { colorSubject, RgbColor } from './RgbSlider'
-import BaseRouter from './routing/router'
 import logo from './assets/triangle.svg'
+import { colorSubject } from './RgbSlider'
+import BaseRouter from './routing/router'
+import TabBar from './routing/TabBar'
 import { makeFilter } from './util/color'
 import { useObservableValue } from './util/rxjs'
-import TabBar from './routing/TabBar'
 
 const throttledColorSubject = colorSubject.pipe(
   throttleTime(200, undefined, { leading: true, trailing: true })
 )
-
-async function sendColorUpdate(c: RgbColor) {
-  try {
-    await axios.post('http://192.168.0.175:4061/testnet', {
-      color: [c[0], c[2], c[1]],
-    })
-  } catch (e) {
-    console.log(e.request, e.response)
-  }
-}
 
 function App() {
   const colorFn = useCallback(value => Color(value), [])
@@ -35,7 +25,7 @@ function App() {
 
   useEffect(() => {
     const sub = throttledColorSubject.subscribe({
-      next: sendColorUpdate,
+      next: setColor,
     })
     return () => sub.unsubscribe()
   })
