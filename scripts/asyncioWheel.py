@@ -83,6 +83,7 @@ loop = asyncio.get_event_loop()
 try:
   asyncio.ensure_future(colorLoop([(0,207,169), (196,154, 0)], 50, 10))
   # asyncio.ensure_future(colorLoop([(255,0,0), (0,255,0), (0,0,255)], 50, 10))
+  # asyncio.ensure_future(colorLoop([(0,0, 0), (0,255,0), (0,0, 0), (0,0, 0), (0,255,0), (0,0, 0), (0,0, 0)], 20, 30))
   loop.run_forever()
 except KeyboardInterrupt:
   pass

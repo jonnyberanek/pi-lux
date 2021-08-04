@@ -86,14 +86,16 @@ app.get('/scripts', (req, res) => {
   res.send(responseData)
 })
 
+let scriptProcess;
+
 app.post('/scripts/:scriptName/run', (req, res) => {
   const {scriptName} = req.params
   const args = JSON.stringify(req.body)
 
   const makeMsg = (msg) => `[pyscript/${scriptName} (${new Date().toISOString()})]: ${msg}`
 
-  let scriptProcess
   try{
+    if(scriptProcess) scriptProcess.kill()
     scriptProcess = spawn('python3', ['-u', `${process.cwd()}/scripts/${scriptName}.py`, args])
   } catch(e){
     res.status(500).send(e.message)
