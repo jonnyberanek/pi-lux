@@ -10,7 +10,7 @@ class IPixelList(ABC):
     pass
 
   @abstractmethod
-  def setPixel(self, index:int, color):
+  def setPixel(self, index:int, color:AnyColor):
     pass
 
   @abstractmethod
