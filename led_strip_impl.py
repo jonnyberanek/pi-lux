@@ -5,7 +5,7 @@ from adafruit_ws2801 import WS2801
 
 odata = board.MOSI
 oclock = board.SCLK
-numleds = 160
+numleds = 112
 bright = 1.0
 
 def getAppPixelWriter():
