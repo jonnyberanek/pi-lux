@@ -1,7 +1,7 @@
 from pixlr.pixel import Rbg, Rgb
 import time
 
-import pixel_impl as impl
+import console_pixel_impls as impl
 from pixlr.strip import PixelStripWriter
 
 leds = PixelStripWriter(impl.ConsoleStrip(10, impl.LinearConsoleDisplay()))
