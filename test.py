@@ -1,15 +1,16 @@
+from pixlr.pixel import Rbg, Rgb
 import time
 
 import pixel_impl as impl
 from pixlr.strip import PixelStripWriter
 
-# leds = PixelStripWriter(impl.ConsoleStrip(10, impl.LinearConsoleDisplay()))
+leds = PixelStripWriter(impl.ConsoleStrip(10, impl.LinearConsoleDisplay()))
 # leds = PixelStripWriter(impl.ConsoleStrip(10, impl.LoopedConsoleDisplay()))
-leds = PixelStripWriter(impl.LoopConsiderateConsoleStrip(11))
+# leds = PixelStripWriter(impl.LoopConsiderateConsoleStrip(11))
 while True: 
   for i in range(0,leds.strip.numPixels):
-    leds.setPixels([0,0,0])
-    leds.strip.setPixel(i, [255,255,255])
+    leds.setPixels([0,1,0])
+    leds.strip.setPixel(i, Rbg(255,500,22))
     leds.strip.show()
     time.sleep(0.2)
 

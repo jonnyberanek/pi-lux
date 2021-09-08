@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod, abstractproperty
+from pixlr.pixel import AnyColor
 from typing import Type
 
 class IPixelList(ABC):
-
 
   @property
   @abstractproperty
@@ -16,15 +16,13 @@ class IPixelList(ABC):
   @abstractmethod
   def show(self):
     pass
-  
-
 
 class PixelStripWriter():
   
   def __init__(self, strip: IPixelList) -> None:
     self.strip = strip
 
-  def setPixels(self, color):
+  def setPixels(self, color: AnyColor):
     for i in range(0,self.strip.numPixels):
       self.strip.setPixel(i, color)
 

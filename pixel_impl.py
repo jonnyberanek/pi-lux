@@ -1,5 +1,6 @@
 import os
 from abc import ABC, abstractmethod
+from pixlr.pixel import AnyColor, Pixel, Rgb
 from typing import List
 from math import ceil
 
@@ -51,15 +52,15 @@ class LoopedConsoleDisplay(ConsoleDisplay):
 
 class ConsoleStrip(IPixelList):
 
-  pixels =[[0,0,0]]
+  pixels: List[Pixel]
 
   def __init__(self, numPixels, display:ConsoleDisplay) -> None:
     super().__init__()
-    self.pixels = [[0,0,0]] * numPixels
+    self.pixels = [Pixel(0,0,0)] * numPixels
     self.display = display
 
-  def setPixel(self, index: int, color):
-    self.pixels[index] = color
+  def setPixel(self, index: int, color:AnyColor):
+    self.pixels[index] = Pixel(color)
     
   def show(self):    
     self.display.show(self.pixels)
@@ -70,18 +71,19 @@ class ConsoleStrip(IPixelList):
 
 class LoopConsiderateConsoleStrip(IPixelList):
   
-  pixels =[[0,0,0]]
+  pixels: List[Pixel]
 
   def __init__(self, numPixels) -> None:
     super().__init__()
-    self.pixels = [[0,0,0]] * numPixels
+    self.pixels = [Pixel(0,0,0)] * numPixels
+    print(self.pixels[0])
     self.display = LoopedConsoleDisplay()
     self.mirrorOffset = numPixels % 2 + 1
 
-  def setPixel(self, index: int, color):
-    self.pixels[index] = color
+  def setPixel(self, index: int, color: AnyColor):
+    self.pixels[index] = Pixel(color)
     mirrorIndex = (self.numPixels*2)-index - self.mirrorOffset
-    self.pixels[mirrorIndex] = color
+    self.pixels[mirrorIndex] = Pixel(color)
     
   def show(self):    
     self.display.show(self.pixels)
