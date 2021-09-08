@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod, abstractproperty
 from typing import Type
 
 class IPixelList(ABC):
-  
-  def __init__(self, numLeds) -> None:
-    super().__init__()
-    self.numLeds = numLeds
+
+
+  @property
+  @abstractproperty
+  def numPixels(self) -> int:
+    pass
 
   @abstractmethod
   def setPixel(self, index:int, color):
@@ -23,7 +25,7 @@ class PixelStripWriter():
     self.strip = strip
 
   def setPixels(self, color):
-    for i in range(0,self.strip.numLeds):
+    for i in range(0,self.strip.numPixels):
       self.strip.setPixel(i, color)
 
   def fill(self, color):

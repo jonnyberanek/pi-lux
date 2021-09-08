@@ -1,22 +1,9 @@
-# import board
-# import adafruit_ws2801
-
-# odata = board.MOSI
-# oclock = board.SCLK
-# numleds = 160
-# bright = 1.0
-
-# ### Example for a Feather M4 driving 25 12mm leds
-# def init():
-#   return adafruit_ws2801.WS2801(
-#     oclock, odata, numleds, brightness=bright, auto_write=False
-#   )
-
-
+import os
+from abc import ABC, abstractmethod
 from typing import List
+from math import ceil
+
 from pixlr.strip import IPixelList
-from abc import ABC, abstractmethod, abstractproperty
-import os 
 
 clear = lambda: os.system('cls')
 
@@ -53,7 +40,7 @@ class LoopedConsoleDisplay(ConsoleDisplay):
   def makeFrame(self, colors) -> str:
     dispStr = ""
     lastIndex = len(colors)
-    halfIndex = int(lastIndex/2)
+    halfIndex = ceil(lastIndex/2)
     for i in range(0, halfIndex):
       dispStr += self.makeColor(colors[i])
     dispStr += '\n'
@@ -66,36 +53,39 @@ class ConsoleStrip(IPixelList):
 
   pixels =[[0,0,0]]
 
-  def __init__(self, numLeds, display:ConsoleDisplay) -> None:
-    super().__init__(numLeds)
-    self.pixels = [[0,0,0]] * numLeds
+  def __init__(self, numPixels, display:ConsoleDisplay) -> None:
+    super().__init__()
+    self.pixels = [[0,0,0]] * numPixels
     self.display = display
 
   def setPixel(self, index: int, color):
     self.pixels[index] = color
-
-  def makeColor(self, color:List[int]):
-    disp = '['
-    for i in range(len(color)):
-      if (i != 0):
-        disp += ', '
-      disp += str(color[i]).rjust(3)
-    return disp+']'  
     
   def show(self):    
     self.display.show(self.pixels)
 
+  @property
+  def numPixels(self):
+    return len(self.pixels)
 
-# class LoopedConsoleStrip(IPixelList):
+class LoopConsiderateConsoleStrip(IPixelList):
+  
+  pixels =[[0,0,0]]
 
-#   pixels =[[0,0,0]]
+  def __init__(self, numPixels) -> None:
+    super().__init__()
+    self.pixels = [[0,0,0]] * numPixels
+    self.display = LoopedConsoleDisplay()
+    self.mirrorOffset = numPixels % 2 + 1
 
-#   def __init__(self, numLeds) -> None:
-#     super().__init__(numLeds)
-#     self.pixels = [[0,0,0]] * numLeds
-
-#   def setPixel(self, index: int, color):
-#     self.pixels[index] = color
-
-
+  def setPixel(self, index: int, color):
+    self.pixels[index] = color
+    mirrorIndex = (self.numPixels*2)-index - self.mirrorOffset
+    self.pixels[mirrorIndex] = color
     
+  def show(self):    
+    self.display.show(self.pixels)
+  
+  @property
+  def numPixels(self):
+    return ceil(len(self.pixels)/2)
