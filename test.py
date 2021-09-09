@@ -3,7 +3,7 @@ from pixlr.animation import Animator
 from pixlr.pixel import Rgb
 import console_pixel_impls as impl
 from pixlr.strip import PixelStripWriter
-# from led_strip_impl import getAppPixelWriter
+from led_strip_impl import getAppPixelWriter
 
 """
 Lerp Helpers
@@ -51,10 +51,10 @@ def colorLoop(colors, ledsPerColor=10):
 
 def main():
   # leds = PixelStripWriter(impl.ConsoleStrip(10, impl.LinearConsoleDisplay()))
-  leds = PixelStripWriter(impl.ConsoleStrip(20, impl.LoopedConsoleDisplay()))
+  # leds = PixelStripWriter(impl.ConsoleStrip(20, impl.LoopedConsoleDisplay()))
   # leds = PixelStripWriter(impl.LoopConsiderateConsoleStrip(10))
-  # leds = getAppPixelWriter()
-  animator = Animator(leds, frequency=30)
-  animator.startAnimation(randomRainbowFade(30))
+  leds = getAppPixelWriter()
+  animator = Animator(leds, frequency=60)
+  animator.startAnimation(randomRainbowFade(120))
 
 main()

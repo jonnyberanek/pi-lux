@@ -22,22 +22,40 @@ def getBrightColor():
   random.shuffle(colorIndexPrio)
   color[colorIndexPrio[0]] = 255
   color[colorIndexPrio[1]] = random.randrange(0,256)
-  color[colorIndexPrio[2]] = 255 - color[colorIndexPrio[1]]
+  # So we can get colors like 255,0,0, but never have a sum total higher than 512
+  color[colorIndexPrio[2]] = min(random.randrange(0,256), 255 - color[colorIndexPrio[1]])
   return color
 
-def randomRainbowFade(transitionFrames=15):
+BOTTOM = [10,10,10]
+def randomRainbowFadeInOut(transitionFrames=15):
+  
   def gen(writer: PixelStripWriter):
+  
     while True:
       target = getBrightColor()
-      print(target)
       for i in range(0,transitionFrames):
-        writer.fill(lerpColor([0,0,0], target, i/transitionFrames))
+        writer.fill(lerpColor(BOTTOM, target, i/transitionFrames))
         yield
       writer.fill(target)
       yield
       for i in range(0,transitionFrames):
-        writer.fill(lerpColor(target, [0,0,0], i/transitionFrames))
+        writer.fill(lerpColor(target, BOTTOM, i/transitionFrames))
         yield
-      writer.fill([0,0,0])
+      writer.fill(BOTTOM)
       yield
+  return gen
+  
+def randomRainbowFade(transitionFrames=15):
+  
+  def gen(writer: PixelStripWriter):
+    lastTarget = getBrightColor()
+    writer.fill(lastTarget)
+    yield
+    while True:
+      target = getBrightColor()
+      for i in range(0,transitionFrames):
+        writer.fill(lerpColor(lastTarget, target, i/transitionFrames))
+        yield
+      writer.fill(target)
+      lastTarget = target
   return gen
