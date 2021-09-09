@@ -1,29 +1,9 @@
+from animations.rainbow import randomRainbowFade
 from pixlr.animation import Animator
-from pixlr.pixel import Rbg, Rgb
-import time
-
+from pixlr.pixel import Rgb
 import console_pixel_impls as impl
 from pixlr.strip import PixelStripWriter
 # from led_strip_impl import getAppPixelWriter
-
-# leds = PixelStripWriter(impl.ConsoleStrip(10, impl.LinearConsoleDisplay()))
-leds = PixelStripWriter(impl.ConsoleStrip(20, impl.LoopedConsoleDisplay()))
-# leds = PixelStripWriter(impl.LoopConsiderateConsoleStrip(10))
-# leds = getAppPixelWriter()
-
-
-# from pixlr.pixel import Pixel, Rgb, Rbg
-
-# colorRgb = Rgb(1,2,3)
-# colorPixel = Pixel(1,3,2)
-
-# print(isinstance(colorRgb, Rgb))
-# print(isinstance(colorRgb, Rbg))
-# print(isinstance(colorPixel, Rgb))
-# print(isinstance(colorPixel, Rbg))
-
-# color = Pixel(Rgb(0,33,55))
-# print(color)
 
 """
 Lerp Helpers
@@ -58,7 +38,6 @@ def colorLoop(colors, ledsPerColor=10):
       color = lerpColor(colors[colorIndex], colors[(colorIndex+1) % numColors], sequenceOffset % 1)
       loop.append(color)
     writer.strip.show()
-    
     while True:
       for j in range(stripLength):
         for i in range(stripLength):
@@ -70,5 +49,12 @@ def colorLoop(colors, ledsPerColor=10):
         yield
   return gen
 
-animator = Animator(leds, frequency=1)
-animator.startAnimation(colorLoop([(0,207,169), (196,154, 0)], 5))
+def main():
+  # leds = PixelStripWriter(impl.ConsoleStrip(10, impl.LinearConsoleDisplay()))
+  leds = PixelStripWriter(impl.ConsoleStrip(20, impl.LoopedConsoleDisplay()))
+  # leds = PixelStripWriter(impl.LoopConsiderateConsoleStrip(10))
+  # leds = getAppPixelWriter()
+  animator = Animator(leds, frequency=30)
+  animator.startAnimation(randomRainbowFade(30))
+
+main()
