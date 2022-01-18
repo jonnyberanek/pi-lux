@@ -1,5 +1,5 @@
-from pixlr.pixel import AnyColor, Pixel
-from pixlr.strip import IPixelList
+from ledcontroller.pixel import AnyColor, Pixel
+from ledcontroller.strip import IPixelList
 from adafruit_ws2801 import WS2801
 from math import ceil
 

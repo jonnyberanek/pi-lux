@@ -1,10 +1,10 @@
 import os
 from abc import ABC, abstractmethod
-from pixlr.pixel import AnyColor, Pixel, Rgb
+from ledcontroller.pixel import AnyColor, Pixel, Rgb
 from typing import List
 from math import ceil
 
-from pixlr.strip import IPixelList
+from ledcontroller.strip import IPixelList
 
 clear = lambda: os.system('cls')
 
