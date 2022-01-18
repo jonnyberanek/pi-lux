@@ -1,8 +1,10 @@
-from animations.helpers import lerpColor
-from ledcontroller.strip import PixelDisplayWriter
+from lux.core.strip import PixelDisplayWriter
+
+from .helpers import lerpColor
+
 
 def colorLoop(colors, ledsPerColor=10):
-  def gen(writer):
+  def gen(writer: PixelDisplayWriter):
     color = colors[0]
     numColors = len(colors)
     stripLength = writer.strip.numPixels

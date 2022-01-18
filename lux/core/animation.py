@@ -1,6 +1,8 @@
-from typing import Callable, Generator
-from ledcontroller.strip import PixelDisplayWriter
 from time import sleep
+from typing import Callable, Generator
+
+from .strip import PixelDisplayWriter
+
 
 class Animator():
   """

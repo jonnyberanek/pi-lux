@@ -1,12 +1,12 @@
-from animations.dainty_rainbow import randomRainbowFade
-from animations.lonestar import lonestar
-from animations.rainbow_chaser import rainbowChaser
-from ledcontroller.animation import Animator
-from led_strip_impl import getAppPixelWriter
+from lux.app.animations.lonestar import lonestar
+from lux.app.animations.rainbow_chaser import rainbowChaser
+from lux.app.app_writer import getAppPixelWriter
+from lux.core.animation import Animator
+
 
 def main():
   leds = getAppPixelWriter()
   animator = Animator(leds, frequency=30)
-  animator.startAnimation(lonestar)
+  animator.startAnimation(rainbowChaser())
 
 main()

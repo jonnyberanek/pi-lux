@@ -1,6 +1,9 @@
 import random
-from animations.helpers import lerpColor
-from ledcontroller.strip import PixelDisplayWriter
+
+from lux.core.strip import PixelDisplayWriter
+
+from .helpers import lerpColor
+
 
 def getBrightColor():
   # Guarantees a bright color,

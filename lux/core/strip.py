@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod, abstractproperty
-from ledcontroller.pixel import AnyColor
-from typing import Type
+
+from .pixel import AnyColor
+
 
 class IPixelList(ABC):
 

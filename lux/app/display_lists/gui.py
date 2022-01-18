@@ -1,8 +1,9 @@
 import os
-from ledcontroller.pixel import AnyColor, Pixel
+from tkinter import Canvas, Tk
 from typing import List
-from tkinter import Tk, Canvas
-from ledcontroller.strip import IPixelList
+
+from lux.core.pixel import AnyColor, Pixel
+from lux.core.strip import IPixelList
 
 clear = lambda: os.system('cls')
 

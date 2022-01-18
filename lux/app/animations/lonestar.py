@@ -1,5 +1,5 @@
-from ledcontroller.pixel import Rgb
-from ledcontroller.strip import PixelDisplayWriter
+from lux.core.pixel import Rgb
+from lux.core.strip import PixelDisplayWriter
 
 def lonestar(writer: PixelDisplayWriter):
   while True: 
