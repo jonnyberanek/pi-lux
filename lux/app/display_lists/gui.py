@@ -1,9 +1,11 @@
+from abc import abstractmethod
 import os
 from tkinter import Canvas, Tk
 from typing import List
 
 from lux.core.pixel import AnyColor, Pixel
 from lux.core.strip import IPixelList
+import math
 
 clear = lambda: os.system('cls')
 
@@ -19,27 +21,30 @@ class PixelRowGui():
   """
 
   pixelSize: int
-  numPixels: int
+  pixelsPerRow: int
+  rows: int
+
   pixelRectIds: List[int]
   canvas: Canvas
   window: Tk
 
-  def __pixelRect(self, index: int):
+  def __pixelRect(self, col: int, row: int):
     return (
-      index * self.pixelSize, 
-      -OUTLINE_OFFSET, 
-      index * self.pixelSize + self.pixelSize, 
-      self.pixelSize
+      col * self.pixelSize, 
+      row*self.pixelSize - OUTLINE_OFFSET, 
+      col * self.pixelSize + self.pixelSize, 
+      (row+1) * self.pixelSize
     )
   
-  def __init__(self, pixelSize: int, numPixels: int):
+  def __init__(self, pixelSize: int, pixelsPerRow: int, rows=1):
     self.pixelSize = pixelSize
-    self.numPixels = numPixels
+    self.pixelsPerRow = pixelsPerRow
+    self.rows = rows
     self.createDisplay()
 
   def createDisplay(self):
-    canvasWidth = self.pixelSize * self.numPixels
-    canvasHeight = self.pixelSize
+    canvasWidth = self.pixelSize * self.pixelsPerRow
+    canvasHeight = self.pixelSize * self.rows
 
     self.window = Tk()
     self.window.geometry(f"{canvasWidth}x{canvasHeight}")
@@ -51,13 +56,14 @@ class PixelRowGui():
     self.canvas.pack()
 
     self.pixelRectIds = []
-    for i in range(self.numPixels):
-      id = self.canvas.create_rectangle(
-        *self.__pixelRect(i), 
-        fill="black",
-        outline=BORDER_COLOR
-      )
-      self.pixelRectIds.append(id)
+    for y in range(self.rows):
+      for x in range(self.pixelsPerRow):
+        id = self.canvas.create_rectangle(
+          *self.__pixelRect(x,y), 
+          fill="black",
+          outline=BORDER_COLOR
+        )
+        self.pixelRectIds.append(id)
 
     self.window.update()
 
@@ -67,12 +73,36 @@ class PixelRowGui():
       fill=pixel.toHex()
     )
 
+# def rotate(points, angle, center):
+#   angle = math.radians(angle)
+#   cos_val = math.cos(angle)
+#   sin_val = math.sin(angle)
+#   cx, cy = center
+#   new_points = []
+#   for x_old, y_old in points:
+#     x_old -= cx
+#     y_old -= cy
+#     x_new = x_old * cos_val - y_old * sin_val
+#     y_new = x_old * sin_val + y_old * cos_val
+#     new_points.append([x_new + cx, y_new + cy])
+#   return new_points
+
+# class DisplayMapper(ABC):
+
+#   @abstractmethod
+#   def getCoordinate(self, ):
+#     pass
+
 class PixelGuiDisplay(IPixelList):
 
-  def __init__(self, numPixels) -> None:
+  # mapper: DisplayMapper
+
+  # ppr*rows = t   coord = (int(idx/ppr), idx%rows)  
+
+  def __init__(self, pixelsPerRow: int, rows=1) -> None:
     super().__init__()
-    self.__numPixels = numPixels
-    self.gui = PixelRowGui(PIXEL_SIZE, self.__numPixels)
+    self.__numPixels = pixelsPerRow*rows
+    self.gui = PixelRowGui(PIXEL_SIZE, pixelsPerRow, rows)
 
   def setPixel(self, index: int, color:AnyColor):
     self.gui.setPixel(index, Pixel(color))

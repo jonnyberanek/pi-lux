@@ -17,5 +17,5 @@ def getAppPixelWriter() -> PixelDisplayWriter:
     pass
   if(strip == None):
     from lux.app.display_lists.gui import PixelGuiDisplay
-    strip = PixelGuiDisplay(numPixels=40)
+    strip = PixelGuiDisplay(pixelsPerRow=20, rows=1)
   return PixelDisplayWriter(strip)
