@@ -21,10 +21,6 @@ class Animation():
 
 class Animator():
   """
-  # This class composes a writer and animations to handle an animation.
-
-  # This standardizes the animation producer and guarantees the animation never
-  # depends on a specific implementation of PixelStripWriter.
   TODO
   """
 
@@ -76,17 +72,6 @@ class Animator():
         self.writer.fill(data)
       time.sleep(self.frameTime)
 
-class SimpleTickAnimation(Animation):
 
-  loopSize = 7
-  outRange = 256
 
-  def _animate(self, intervalTime, time):
-    oList = []
-    for i in range(0, self.size):
 
-      pctOfLoop = ((intervalTime + i) % self.loopSize) / self.loopSize
-      pos = int(pctOfLoop * self.outRange % self.outRange)
-
-      oList.append(pos)
-    return oList

@@ -18,23 +18,6 @@ def getBrightColor():
   color[colorIndexPrio[2]] = min(random.randrange(0,256), 255 - color[colorIndexPrio[1]])
   return color
 
-
-  
-def randomRainbowFade(transitionFrames=15):
-  
-  def gen(writer: PixelDisplayWriter):
-    lastTarget = getBrightColor()
-    writer.fill(lastTarget)
-    yield
-    while True:
-      target = getBrightColor()
-      for i in range(0,transitionFrames):
-        writer.fill(lerpColor(lastTarget, target, i/transitionFrames))
-        yield
-      writer.fill(target)
-      lastTarget = target
-  return gen
-
 BOTTOM = [10,10,10]
 class DaintyFadeInOutAnimation(Animation):
 

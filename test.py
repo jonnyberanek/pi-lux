@@ -14,12 +14,17 @@ from test_animations.shared import Animation, Animator
 
 print_lock = threading.Lock()
 
-class AnimationHelper():
+class AnimationManager():
 
   STOP_ANIMATION = "STOP"
 
   animation: Animator
+
+  # TODO: make setter instead of direct assignment (Can maybe obscure that a null means "stop" or something)
   nextAnimation: Animation = None
+
+  def setNextAnimation(self, next: Animation):
+    self.nextAnimation = next
 
   def __init__(self, animator: Animator, *args, **kwargs):
     super(self.__class__, self).__init__(*args, **kwargs)
@@ -27,9 +32,9 @@ class AnimationHelper():
     self.animator = animator
 
   def run(self):
-    print (threading.current_thread().name)
+    print (f"[{threading.current_thread().name}] AnimationManager is running")
     while True:
-      if self.nextAnimation == AnimationHelper.STOP_ANIMATION:
+      if self.nextAnimation == AnimationManager.STOP_ANIMATION:
         self.nextAnimation = None
         self.animator.clearAnimation()
         continue
@@ -47,11 +52,11 @@ class AnimationHelper():
   def animate(self, message):
     if self.receive_messages:
       with print_lock:
-        print (threading.currentThread().getName(), "Received {}".format(message))
+        print(f"[{threading.current_thread().name}] Received {message}")
 
 class CommandThread(threading.Thread):
 
-  animThread: AnimationHelper
+  animThread: AnimationManager
 
   def __init__(self, animThread, *args, **kwargs):
     super(self.__class__, self).__init__(*args, **kwargs)
@@ -62,7 +67,7 @@ class CommandThread(threading.Thread):
     time.sleep(0.5)
     self.sendCommand(RainbowChaserAnimation(20, 3, 10))
     time.sleep(2)
-    self.sendCommand(AnimationHelper.STOP_ANIMATION)
+    self.sendCommand(AnimationManager.STOP_ANIMATION)
     time.sleep(2)
     self.sendCommand(DaintyFadeInOutAnimation(20,3))
 
@@ -129,7 +134,7 @@ if __name__ == '__main__':
   animator = Animator(leds, frequency=30)
 
   # # Threading
-  thread = AnimationHelper(animator)
+  thread = AnimationManager(animator)
 
   cmdThread = CommandThread(thread)
   cmdThread.start()
