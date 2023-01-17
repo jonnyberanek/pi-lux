@@ -1,6 +1,6 @@
-from dataclasses import dataclass
 import time
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from math import floor
 from typing import Generic, Tuple, TypeVar
 
@@ -9,7 +9,6 @@ ColorVector = Tuple[int, int, int]
 @dataclass
 class TimeInstant:
   time: float
-  pass
 
 P = TypeVar("P")
 
@@ -52,9 +51,14 @@ class Coordinator(ABC):
   def updateDisplays(self, instant: TimeInstant):
     pass
 
+  @abstractmethod
+  def clearDisplays(self):
+    pass
+
 class SimpleCoordinator(Coordinator, Generic[P]):
 
   instruction: Instruction[P] = None
+  display: Display[P]
 
   def __init__(self, display) -> None:
     super().__init__()
@@ -65,6 +69,11 @@ class SimpleCoordinator(Coordinator, Generic[P]):
       point = self.display.coordSpace.getPoint(i)
       color = self.instruction.getColorAtPoint(point, instant, self.display.coordSpace)
       self.display.setPixel(i, color)
+    self.display.render()
+
+  def clearDisplays(self):
+    for i in range(self.display.length):
+      self.display.setPixel(i, [0,0,0])
     self.display.render()
 
 class IndexCoordSpace(CoordSpace[int]):
@@ -95,7 +104,7 @@ class IndexArrayDisplay(Display[int]):
 
   def render(self):
     print([("_" if (c[0] < 128) else "X") for c in self.colors])
-    
+
 
 class ChaserInstruction(Instruction[int]):
   def getColorAtPoint(self, point: int, instant: TimeInstant, coordSpace: CoordSpace[int]) -> ColorVector:

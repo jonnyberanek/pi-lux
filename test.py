@@ -1,16 +1,12 @@
-from lux.app.animations.dainty_rainbow import randomRainbowFadeInOut
-# from lux.app.animations.rainbow_chaser import rainbowChaser
-from test_animations.dainty_rainbow import DaintyFadeInOutAnimation
-from test_animations.rainbow_chaser import RainbowChaserAnimation
-from lux.app.app_writer import getAppPixelWriter
-# from lux.core.animation import Animator
-import asyncio
+from lux.app.display_lists.gui import PixelRowGui
+from lux.core.pixel import Pixel
+from lux.core2.main import ColorVector, Display, IndexCoordSpace, Instruction, SimpleCoordinator
+from test_animations.dainty_rainbow import DaintyFadeInOutInstruction
+from test_animations.rainbow_chaser import RainbowChaserInstruction
 import threading
-from queue import Queue
 import time
-from typing import Coroutine
 
-from test_animations.shared import Animation, Animator
+from test_animations.shared import Animation, Animator, Animator2
 
 print_lock = threading.Lock()
 
@@ -18,13 +14,13 @@ class AnimationManager():
 
   STOP_ANIMATION = "STOP"
 
-  animation: Animator
+  animator: Animator2
 
   # TODO: make setter instead of direct assignment (Can maybe obscure that a null means "stop" or something)
-  nextAnimation: Animation = None
+  nextInstruction: Instruction = None
 
-  def setNextAnimation(self, next: Animation):
-    self.nextAnimation = next
+  def setNextInstruction(self, next: Animation):
+    self.nextInstruction = next
 
   def __init__(self, animator: Animator, *args, **kwargs):
     super(self.__class__, self).__init__(*args, **kwargs)
@@ -34,14 +30,14 @@ class AnimationManager():
   def run(self):
     print (f"[{threading.current_thread().name}] AnimationManager is running")
     while True:
-      if self.nextAnimation == AnimationManager.STOP_ANIMATION:
-        self.nextAnimation = None
+      if self.nextInstruction == AnimationManager.STOP_ANIMATION:
+        self.nextInstruction = None
         self.animator.clearAnimation()
         continue
-      if self.nextAnimation != None:
-        print(f"Running {self.nextAnimation}")
-        self.animator.setAnimation(self.nextAnimation)
-        self.nextAnimation = None
+      if self.nextInstruction != None:
+        print(f"Running {self.nextInstruction}")
+        self.animator.setInstruction(self.nextInstruction)
+        self.nextInstruction = None
       if self.animator.currentAnimation != None :
         self.animator.renderFrame()
         time.sleep(self.animator.frameTime)
@@ -65,73 +61,40 @@ class CommandThread(threading.Thread):
 
   def run(self) -> None:
     time.sleep(0.5)
-    self.sendCommand(RainbowChaserAnimation(20, 3, 10))
+    self.sendCommand(RainbowChaserInstruction(10))
     time.sleep(2)
     self.sendCommand(AnimationManager.STOP_ANIMATION)
     time.sleep(2)
-    self.sendCommand(DaintyFadeInOutAnimation(20,3))
+    self.sendCommand(DaintyFadeInOutInstruction())
 
   def sendCommand(self, cmd: str):
     print("Sending command: {}".format(cmd))
-    self.animThread.nextAnimation = cmd
+    self.animThread.nextInstruction = cmd
 
-"""
-class FakeRunner():
+PIXEL_SIZE = 20
 
-  async def runCommand(self, cmd: str):
-    while True:
-      print("Running {}".format(cmd))
-      await asyncio.sleep(0.2)
-    
+class PixelGuiDisplay(Display):
 
-class AsyncioCommandThread(threading.Thread):
-  # Mocks an asyncronous input like an http server
+  def __init__(self, pixelsPerRow: int, rows=1) -> None:
+    super().__init__()
+    self.__numPixels = pixelsPerRow*rows
+    self.gui = PixelRowGui(PIXEL_SIZE, pixelsPerRow, rows)
+    self.coordSpace = IndexCoordSpace(self.length)
 
-  # loop: asyncio.ProactorEventLoop
-  runner: FakeRunner
-  coro: Coroutine = None
+  def setPixel(self, index: int, color: ColorVector):
+    self.gui.setPixel(index, Pixel(color))
+  
+  def render(self):
+    self.gui.window.update()
 
-  def __init__(self, loop, runner, *args, **kwargs):
-    super(self.__class__, self).__init__(*args, **kwargs)
-    self.daemon = True
-    
-    self.runner = runner
-
-  def run(self) -> None:
-    self.loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(self.loop)
-    time.sleep(0.5)
-    self.sendCommand("Jump")
-    time.sleep(2)
-    self.sendCommand("Wave")
-
-  def sendCommand(self, cmd: str):
-    # if(self.current != None):
-    #   try:
-    #     self.current.close()
-    #   except Exception as e:
-    #     print(e) 
-    print("Sending command: {}".format(cmd))
-    # self.coro = 
-    self.loop.create_task(self.runner.runCommand(cmd))
-    # asyncio.ensure_future(self.coro)
-
-class App():
-
-  loop: asyncio.BaseEventLoop
-
-  def __init__(self) -> None:
-    self.loop = asyncio.new_event_loop()
-
-  def start(self):
-    AsyncioCommandThread(self.loop, FakeRunner()).start()
-    time.sleep(5)
-"""
-
+  @property
+  def length(self) -> int:
+    return self.__numPixels
 
 if __name__ == '__main__':
-  leds = getAppPixelWriter()
-  animator = Animator(leds, frequency=30)
+  display = PixelGuiDisplay(pixelsPerRow=20, rows=1)
+  coordinator = SimpleCoordinator(display)
+  animator = Animator2(coordinator, frequency=30)
 
   # # Threading
   thread = AnimationManager(animator)
@@ -139,26 +102,3 @@ if __name__ == '__main__':
   cmdThread = CommandThread(thread)
   cmdThread.start()
   thread.run()
-
-  # time.sleep(5)
-
-
-  # Asyncio
-  # idfk
-
-
-  # animator.startAnimation(DaintyFadeInOutAnimation(leds.display.numPixels,3))
-
-  # start = time.time()
-
-  # while (time.time() - start) < 3:
-  #  deltaTime = time.time() - start
-  # #  print(f"{deltaTime:.2f}", simpleTick(deltaTime))
-  # #  print(f"{deltaTime:.2f}", animation.getFrame(deltaTime))
-
-
-
-  #  time.sleep(0.2)
-  #  print("")
-
-  # animator.startAnimation(randomRainbowFadeInOut())

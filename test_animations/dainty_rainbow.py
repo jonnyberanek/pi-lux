@@ -1,8 +1,8 @@
 import random
 from lux.app.animations.helpers import lerpColor
 
-from lux.core.strip import PixelDisplayWriter
-from test_animations.shared import Animation
+from lux.core2.main import ColorVector, CoordSpace, Instruction, TimeInstant
+from test_animations.shared import Animation, Intervaled
 
 
 def getBrightColor():
@@ -38,6 +38,30 @@ class DaintyFadeInOutAnimation(Animation):
     # Split the interval into two halves
     colorspacePct = (intervalTime / self.interval * 2) % 1
     if (intervalTime >= self.interval/2.0):
+      colorspacePct = 1 - colorspacePct
+    
+    return lerpColor(BOTTOM, self.targetColor, colorspacePct)
+
+class DaintyFadeInOutInstruction(Instruction[int], Intervaled):
+
+  interval: float = 3
+  targetColor: list[int]
+
+  def __init__(self) -> None:
+    super().__init__()
+    self.targetColor = getBrightColor()
+    self.currentInterval = 0
+
+  def getColorAtPoint(self, point: int, instant: TimeInstant, coordSpace: CoordSpace[int]) -> ColorVector:
+    iinstant = self.getIntervalTimeInstant(instant)
+    # Get a new color if we are on a new interval
+    if (iinstant.time // self.interval) != self.currentInterval:
+      self.currentInterval = iinstant.time // self.interval
+      self.targetColor = getBrightColor()
+
+    # Split the interval into two halves
+    colorspacePct = iinstant.intervalPercent * 2 % 1
+    if (iinstant.intervalTime >= self.interval/2.0):
       colorspacePct = 1 - colorspacePct
     
     return lerpColor(BOTTOM, self.targetColor, colorspacePct)

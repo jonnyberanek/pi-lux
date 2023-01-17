@@ -1,7 +1,9 @@
+from dataclasses import dataclass
 import time
-
-from lux.core.strip import PixelDisplayWriter
 from abc import abstractmethod
+
+from lux.core2.main import Instruction, SimpleCoordinator, TimeInstant
+from lux.core.strip import PixelDisplayWriter
 
 class Animation():
 
@@ -18,6 +20,28 @@ class Animation():
 
   def getFrame(self, time: float):
     return self._animate(time % self.interval, time)
+
+@dataclass
+class IntervalTimeData(TimeInstant):
+  interval: float
+
+  @property
+  def intervalTime(self):
+    return self.time % self.interval
+
+  @property
+  def intervalPercent(self):
+    return self.intervalTime / self.interval
+
+class Intervaled():
+
+  @property
+  @abstractmethod
+  def interval(self) -> float:
+    pass
+  
+  def getIntervalTimeInstant(self, instant: TimeInstant):
+    return IntervalTimeData(instant.time, self.interval)
 
 class Animator():
   """
@@ -73,5 +97,34 @@ class Animator():
       time.sleep(self.frameTime)
 
 
+class Animator2():
+  """
+  TODO
+  """
+  coordinator = SimpleCoordinator #TODO determine way to keep abstract
+  animationStartTime: float = None
 
+  def __init__(self, coordinator: SimpleCoordinator, frequency=60) -> None:
+    self.coordinator = coordinator
+    self.frequency = frequency
 
+  @property
+  def frameTime(self):
+    return 1/self.frequency
+  
+  def setInstruction(self, animation: Instruction):
+    self.animationStartTime = time.time()
+    self.coordinator.instruction = animation
+
+  def clearAnimation(self):
+    self.animationStartTime = None
+    self.coordinator.instruction = None
+    self.coordinator.clearDisplays()
+
+  @property
+  def currentAnimation(self):
+    return self.coordinator.instruction
+
+  def renderFrame(self):
+    deltaTime = time.time() - self.animationStartTime
+    self.coordinator.updateDisplays(TimeInstant(deltaTime))

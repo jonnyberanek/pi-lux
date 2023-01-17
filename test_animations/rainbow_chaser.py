@@ -1,5 +1,5 @@
-from lux.core.strip import PixelDisplayWriter
-from test_animations.shared import Animation
+from lux.core2.main import ColorVector, CoordSpace, Instruction, TimeInstant
+from test_animations.shared import Animation, Intervaled
 
 def wheel(pos):
     if pos < 85:
@@ -32,3 +32,20 @@ class RainbowChaserAnimation(Animation):
 
       oList.append(wheel(pos))
     return oList
+
+
+class RainbowChaserInstruction(Instruction[int], Intervaled):
+
+  interval: float = 3
+  loopSize: int
+
+  def __init__(self, loopSize: int) -> None:
+    super().__init__()
+    self.loopSize = loopSize
+
+  def getColorAtPoint(self, point: int, instant: TimeInstant, coordSpace: CoordSpace[int]) -> ColorVector:
+    pctInterval = self.getIntervalTimeInstant(instant).intervalPercent
+    bound = coordSpace.bounds[1] # TODO: dont assume bounds[0] is 0
+    pctWheel = (point + pctInterval) % bound / bound
+    wheelPos = min(int(pctWheel*COLOR_MAX), COLOR_MAX)
+    return wheel(wheelPos)
