@@ -1,12 +1,43 @@
-from lux.app.display_lists.gui import PixelRowGui
-from lux.core.pixel import Pixel
-from lux.core2.main import ColorVector, Display, IndexCoordSpace, Instruction, SimpleCoordinator
-from test_animations.dainty_rainbow import DaintyFadeInOutInstruction
-from test_animations.rainbow_chaser import RainbowChaserInstruction
 import threading
 import time
+from lux.app.app_writer import getAppPixelDisplay
 
-from test_animations.shared import Animation, Animator, Animator2
+from lux.app.coordinator import SimpleCoordinator
+from lux.app.instructions.dainty_rainbow import DaintyFadeInOutInstruction
+from lux.app.instructions.rainbow_chaser import RainbowChaserInstruction
+from lux.core2.main import Instruction
+from lux.core2.timely import TimeInstant
+class Animator2():
+  """
+  TODO
+  """
+  coordinator = SimpleCoordinator #TODO determine way to keep abstract
+  animationStartTime: float = None
+
+  def __init__(self, coordinator: SimpleCoordinator, frequency=60) -> None:
+    self.coordinator = coordinator
+    self.frequency = frequency
+
+  @property
+  def frameTime(self):
+    return 1/self.frequency
+  
+  def setInstruction(self, animation: Instruction):
+    self.animationStartTime = time.time()
+    self.coordinator.instruction = animation
+
+  def clearAnimation(self):
+    self.animationStartTime = None
+    self.coordinator.instruction = None
+    self.coordinator.clearDisplays()
+
+  @property
+  def currentAnimation(self):
+    return self.coordinator.instruction
+
+  def renderFrame(self):
+    deltaTime = time.time() - self.animationStartTime
+    self.coordinator.updateDisplays(TimeInstant(deltaTime))
 
 print_lock = threading.Lock()
 
@@ -19,10 +50,10 @@ class AnimationManager():
   # TODO: make setter instead of direct assignment (Can maybe obscure that a null means "stop" or something)
   nextInstruction: Instruction = None
 
-  def setNextInstruction(self, next: Animation):
+  def setNextInstruction(self, next: Instruction):
     self.nextInstruction = next
 
-  def __init__(self, animator: Animator, *args, **kwargs):
+  def __init__(self, animator: Instruction, *args, **kwargs):
     super(self.__class__, self).__init__(*args, **kwargs)
     self.daemon = True
     self.animator = animator
@@ -71,28 +102,8 @@ class CommandThread(threading.Thread):
     print("Sending command: {}".format(cmd))
     self.animThread.nextInstruction = cmd
 
-PIXEL_SIZE = 20
-
-class PixelGuiDisplay(Display):
-
-  def __init__(self, pixelsPerRow: int, rows=1) -> None:
-    super().__init__()
-    self.__numPixels = pixelsPerRow*rows
-    self.gui = PixelRowGui(PIXEL_SIZE, pixelsPerRow, rows)
-    self.coordSpace = IndexCoordSpace(self.length)
-
-  def setPixel(self, index: int, color: ColorVector):
-    self.gui.setPixel(index, Pixel(color))
-  
-  def render(self):
-    self.gui.window.update()
-
-  @property
-  def length(self) -> int:
-    return self.__numPixels
-
 if __name__ == '__main__':
-  display = PixelGuiDisplay(pixelsPerRow=20, rows=1)
+  display = getAppPixelDisplay()
   coordinator = SimpleCoordinator(display)
   animator = Animator2(coordinator, frequency=30)
 

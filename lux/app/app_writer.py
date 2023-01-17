@@ -1,21 +1,18 @@
-from lux.core.strip import IPixelList, PixelDisplayWriter
+from lux.core2.main import Display
 
-
-def getAppPixelWriter() -> PixelDisplayWriter:
-  strip: IPixelList = None
+def getAppPixelDisplay() -> Display:
   try:
     import board
-    from lux.app.display_lists import MirroredWS2801Strip, WS2801Strip
+
+    from lux.app.display.displays.led_displays import MirroredWS2801Display, LinearWS2801Display
     odata = board.MOSI
     oclock = board.SCLK
     numleds = 112
     bright = 1.0
-    MirroredWS2801Strip(
+    return MirroredWS2801Display(
       oclock, odata, numleds, brightness=bright, auto_write=False
     )
   except:
-    pass
-  if(strip == None):
-    from lux.app.display_lists.gui import PixelGuiDisplay
-    strip = PixelGuiDisplay(pixelsPerRow=20, rows=1)
-  return PixelDisplayWriter(strip)
+    from lux.app.display.displays.gui_display import PixelGuiDisplay
+    return PixelGuiDisplay(pixelsPerRow=20, rows=1)
+  

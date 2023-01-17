@@ -1,5 +1,5 @@
 from lux.core2.main import ColorVector, CoordSpace, Instruction, TimeInstant
-from test_animations.shared import Animation, Intervaled
+from lux.app.util.time_util import Intervaled
 
 def wheel(pos):
     if pos < 85:
@@ -12,28 +12,6 @@ def wheel(pos):
         return (0, pos * 3, 255 - pos * 3)
 
 COLOR_MAX = 256
-class RainbowChaserAnimation(Animation):
-
-  loopSize: int
-
-  def __init__(self, size: int, interval: float, loopSize: int) -> None:
-    super().__init__(size, interval)
-    self.loopSize = loopSize
-  
-
-  def _animate(self, intervalTime, time):
-    oList = []
-
-    intervalStart = intervalTime/self.interval
-    for i in range(0, self.size):
-      
-      colorspacePct = intervalStart + ((i% self.loopSize)/self.loopSize) 
-      pos = int(colorspacePct * COLOR_MAX % COLOR_MAX)
-
-      oList.append(wheel(pos))
-    return oList
-
-
 class RainbowChaserInstruction(Instruction[int], Intervaled):
 
   interval: float = 3

@@ -1,15 +1,9 @@
-from abc import abstractmethod
-import os
 from tkinter import Canvas, Tk
 from typing import List
 
-from lux.core.pixel import AnyColor, Pixel
-from lux.core.strip import IPixelList
-import math
+from lux.core2.pixel import Pixel
 
-clear = lambda: os.system('cls')
-
-PIXEL_SIZE = 20
+DEFAULT_PIXEL_SIZE = 20
 OUTLINE_OFFSET = 1
 BORDER_COLOR = "#222"
 
@@ -72,44 +66,3 @@ class PixelRowGui():
       self.pixelRectIds[index],
       fill=pixel.toHex()
     )
-
-# def rotate(points, angle, center):
-#   angle = math.radians(angle)
-#   cos_val = math.cos(angle)
-#   sin_val = math.sin(angle)
-#   cx, cy = center
-#   new_points = []
-#   for x_old, y_old in points:
-#     x_old -= cx
-#     y_old -= cy
-#     x_new = x_old * cos_val - y_old * sin_val
-#     y_new = x_old * sin_val + y_old * cos_val
-#     new_points.append([x_new + cx, y_new + cy])
-#   return new_points
-
-# class DisplayMapper(ABC):
-
-#   @abstractmethod
-#   def getCoordinate(self, ):
-#     pass
-
-class PixelGuiDisplay(IPixelList):
-
-  # mapper: DisplayMapper
-
-  # ppr*rows = t   coord = (int(idx/ppr), idx%rows)  
-
-  def __init__(self, pixelsPerRow: int, rows=1) -> None:
-    super().__init__()
-    self.__numPixels = pixelsPerRow*rows
-    self.gui = PixelRowGui(PIXEL_SIZE, pixelsPerRow, rows)
-
-  def setPixel(self, index: int, color:AnyColor):
-    self.gui.setPixel(index, Pixel(color))
-    
-  def show(self):    
-    self.gui.window.update()
-
-  @property
-  def numPixels(self):
-    return self.__numPixels

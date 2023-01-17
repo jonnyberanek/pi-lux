@@ -1,12 +1,29 @@
 import os
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 from math import ceil
 from typing import List
 
-from lux.core.pixel import AnyColor, Pixel
+from lux.core2.pixel import AnyColor, Pixel
 from lux.core.strip import IPixelList
 
 clear = lambda: os.system('cls')
+
+# TODO REMOVE
+class IPixelList(ABC):
+
+  @property
+  @abstractproperty
+  def numPixels(self) -> int:
+    pass
+
+  @abstractmethod
+  def setPixel(self, index:int, color:AnyColor):
+    pass
+
+  @abstractmethod
+  def show(self):
+    pass
+
 
 class ConsoleDisplay(ABC):
   def makeColor(self, color:List[int]):
