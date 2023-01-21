@@ -36,7 +36,7 @@ class MirroredWS2801Display(WS2801Display):
 
   def setPixel(self, index: int, color: ColorVector):
     self[index] = Pixel(color)
-    mirrorIndex = (self.numPixels*2)-index - self.mirrorOffset
+    mirrorIndex = (self.length*2)-index - self.mirrorOffset
     self[mirrorIndex] = Pixel(color)
 
   @property
