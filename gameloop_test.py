@@ -70,6 +70,37 @@ class FixedStepRunner(LoopRunner):
       
       loop.render()
 
+class ThrottledFixedStepRunner(LoopRunner):
+
+  def __init__(self, msPerUpdate: int, maxFps: int = 120) -> None:
+    super().__init__()
+    self.secPerUpdate = msPerUpdate / 1000
+    self.minFrameTime = 1/maxFps
+
+  def run(self, loop: GameLoop):
+    previous = time()
+    lastRender = time()
+    lag = 0
+    while True:
+      current = time()
+      elapsed = current - previous
+      previous = current
+      lag += elapsed
+
+      loop.process()
+
+      while lag >= self.secPerUpdate:
+        loop.update()
+        lag -= self.secPerUpdate
+      
+      loop.render()
+      currentRender = time()
+
+      if(currentRender - lastRender < self.minFrameTime):
+        sleep(self.minFrameTime - (currentRender - lastRender))
+      lastRender = currentRender
+
+
 class TestGameLoop(GameLoop):
 
   letterOs = "o"
@@ -95,7 +126,6 @@ class DisplayGameLoop(GameLoop):
     self.benchmark = FrameBenchmark(100)
   
   def update(self):
-    print(time() - self.start)
     self.coordinator.setPixels(
       self.coordinator.calcPixels(TimeInstant(time() - self.start))
     )
@@ -107,4 +137,4 @@ class DisplayGameLoop(GameLoop):
     self.benchmark.logTime()
 
 
-FixedStepRunner(32).run(DisplayGameLoop())
+ThrottledFixedStepRunner(32, 60).run(DisplayGameLoop())

@@ -5,7 +5,7 @@ from adafruit_ws2801 import WS2801
 from lux.app.coord_space import IndexCoordSpace
 from lux.core2.color import ColorVector
 from lux.core2.main import Display
-from lux.core2.pixel import Pixel
+from lux.core2.pixel import Pixel, Rbg
 
 class WS2801Display(WS2801, Display[int]):
   def __init__(self, *args, **kwargs) -> None:
@@ -35,9 +35,8 @@ class MirroredWS2801Display(WS2801Display):
     self.coordSpace = IndexCoordSpace(self.length)
 
   def setPixel(self, index: int, color: ColorVector):
-    self[index] = Pixel(color)
-    mirrorIndex = (self.length*2)-index - self.mirrorOffset
-    self[mirrorIndex] = Pixel(color)
+    self[index] = Rbg(*color)
+    self[(self.length*2)-index - self.mirrorOffset] = self[index]
 
   @property
   def length(self):
