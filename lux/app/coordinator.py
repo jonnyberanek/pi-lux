@@ -57,7 +57,35 @@ class NotCoordinator(Generic[P]):
       pixels.append(color)
     return pixels
 
-  # def clearDisplays(self):
-  #   for i in range(self.display.length):
-  #     self.display.setPixel(i, [0,0,0])
-  #   self.display.render()
+class DynamicNotCoordinator(Generic[P]):
+
+  instruction: Instruction[P] = None
+  display: Display[P]
+
+  def __init__(self, display) -> None:
+    super().__init__()
+    self.display = display
+    self.pixels = []
+
+  def setPixels(self, pixels):
+    self.pixels = pixels
+
+  def updateDisplay(self):
+    for i in range(min(self.display.length, len(self.pixels))):
+      self.display.setPixel(i, self.pixels[i])
+  
+  def render(self):
+    self.display.render()
+
+  def calcPixels(self, instant: TimeInstant):
+    pixels = []
+    for i in range(self.display.length):
+      point = self.display.coordSpace.getPoint(i)
+      color = self.instruction.getColorAtPoint(point, instant, self.display.coordSpace)
+      pixels.append(color)
+    return pixels
+
+  def clearDisplays(self):
+    for i in range(self.display.length):
+      self.display.setPixel(i, [0,0,0])
+    self.display.render()

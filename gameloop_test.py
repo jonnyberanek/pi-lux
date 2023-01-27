@@ -16,7 +16,7 @@ LOADER = "\\|/-"
 
 class GameLoop(ABC):
 
-  def process(self):
+  def processInput(self):
     pass
   
   def update(self):
@@ -40,7 +40,7 @@ class SerialRunner(LoopRunner):
   def run(self, loop: GameLoop):
     while True: 
       start = time()
-      loop.process()
+      loop.processInput()
       loop.update()
       loop.render()
       diff = start + self.secPerFrame - time()
@@ -62,7 +62,7 @@ class FixedStepRunner(LoopRunner):
       previous = current
       lag += elapsed
 
-      loop.process()
+      loop.processInput()
 
       while lag >= self.secPerUpdate:
         loop.update()
@@ -87,7 +87,7 @@ class ThrottledFixedStepRunner(LoopRunner):
       previous = current
       lag += elapsed
 
-      loop.process()
+      loop.processInput()
 
       while lag >= self.secPerUpdate:
         loop.update()
@@ -137,4 +137,6 @@ class DisplayGameLoop(GameLoop):
     self.benchmark.logTime()
 
 
-ThrottledFixedStepRunner(32, 60).run(DisplayGameLoop())
+if __name__ == '__main__':
+
+  ThrottledFixedStepRunner(32, 60).run(DisplayGameLoop())
