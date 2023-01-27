@@ -42,9 +42,13 @@ class Instruction(ABC, Generic[P]):
 class Coordinator(ABC):
 
   @abstractmethod
-  def updateDisplays(self, instant: TimeInstant):
+  def runInstruction(self, instant: TimeInstant):
     pass
 
   @abstractmethod
-  def clearDisplays(self):
+  def clear(self):
+    pass
+
+  @abstractmethod
+  def render(self):
     pass

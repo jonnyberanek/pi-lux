@@ -1,3 +1,4 @@
+from lux.core2.display import RenderDeferralFacade
 from lux.core2.main import Display
 
 def getAppPixelDisplay() -> Display:
@@ -14,5 +15,5 @@ def getAppPixelDisplay() -> Display:
     )
   except:
     from lux.app.display.displays.gui_display import PixelGuiDisplay
-    return PixelGuiDisplay(pixelsPerRow=20, rows=1)
+    return RenderDeferralFacade(PixelGuiDisplay(pixelsPerRow=20, rows=1))
   
