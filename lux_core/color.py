@@ -19,6 +19,8 @@ class Color(namedtuple('Color', 'r g b'), ColorVector):
     # Define closure for conditional clamping
     condClamp = lambda c : c if not safe else Color.clampColor(c)
 
+    # print(hex(rOrVector), hex(g), hex(b))
+
     # Converts any other list or tuple
     if(isinstance(rOrVector, list) or isinstance(rOrVector, tuple)):
       return super().__new__(cls, *condClamp(rOrVector))
@@ -33,6 +35,12 @@ class Color(namedtuple('Color', 'r g b'), ColorVector):
   @staticmethod
   def clampColor(color):
     return map(Color.clampColorInt, color)
+  
+  @staticmethod
+  def fromHexString(h: str):
+    hi = int(h, 16)
+    print(hex(hi))
+    return Color(rOrVector= hi >> 16 & 0xFF, g = hi >> 8 & 0xFF, b = hi & 0xFF)
 
   def toHex(self, prefix="#"):
     return f'{prefix}%02x%02x%02x' % self
