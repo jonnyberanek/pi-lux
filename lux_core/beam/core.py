@@ -1,10 +1,10 @@
 import ctypes
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class Instruction:
-  command: str
-  parameters: list[any]
+  id: str
+  parameters: list[any] = field(default_factory=lambda: [])
 
 class BeamException(Exception):
   

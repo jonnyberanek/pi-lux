@@ -46,7 +46,7 @@ def create_beam_handler(on_instructions_parsed: Callable[[list[Instruction]], No
         await writer.drain()
 
     except BeamException as e:
-      logger.info(f"BeamException {e!r}")
+      logger.info(f"BeamException: {e!r}")
       code = res_code(e.code)
       writer.write(code)
       await writer.drain()
@@ -58,11 +58,10 @@ def create_beam_handler(on_instructions_parsed: Callable[[list[Instruction]], No
       logger.info(f"Connection closed by client ({peer!r})")
 
     except Exception as e:
-      logger.warning(e)
+      logger.error(e, exc_info=True)
       if not writer.is_closing():
         writer.write(res_code(0xFF))
         pass
-      raise e
     
     finally:
       if not writer.is_closing():

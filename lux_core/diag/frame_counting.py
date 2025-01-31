@@ -1,7 +1,22 @@
-from threading import Thread
+from threading import Event, Thread
 from time import sleep, perf_counter as time
 
-class FrameCounterThread(Thread):
+class StoppableThread(Thread):
+  """Thread class with a stop() method. The thread itself has to check
+  regularly for the stopped() condition."""
+
+  def __init__(self,  *args, **kwargs):
+    super(StoppableThread, self).__init__(*args, **kwargs)
+    self._stop_event = Event()
+
+  def stop(self):
+    self._stop_event.set()
+
+  @property
+  def stopped(self):
+    return self._stop_event.is_set()
+
+class FrameCounterThread(StoppableThread):
   total_count = 0.0
   count = 0.0
 
@@ -14,7 +29,7 @@ class FrameCounterThread(Thread):
   def run(self):
     start_time = time()
     last_check = time()
-    while True:
+    while not self.stopped:
       sleep(1.0)
       now = time()
       count = self.count

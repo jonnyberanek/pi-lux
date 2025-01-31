@@ -2,7 +2,7 @@ import asyncio
 from lux_core.beam.core import Instruction
 
 def instruction_to_bytes(instruction: Instruction) -> str:
-  string = instruction.command
+  string = instruction.id
   if len(instruction.parameters) > 0:
     string += ":" + ";".join(instruction.parameters) + ";;"
   return string.encode()
