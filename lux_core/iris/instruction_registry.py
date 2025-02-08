@@ -1,19 +1,39 @@
 import asyncio
+import collections
+import collections.abc
+from dataclasses import dataclass, field
+import inspect
 from time import ctime
-from typing import Callable
+from typing import Any, Callable, Concatenate, Coroutine, Tuple
+from lux_core.color import Color, ColorVector
+from lux_core.context import LuxContext
+from lux_core.iris.instruction_parser import ParseFunc
 
-from lux_core.color import ColorVector
+# I don't think is designed well, but idc. I need a quick & easy way to parse args
+    
 
-TimeColorFunction = Callable[[float, int], ColorVector]
+@dataclass
+class TickData():
+  time: float
+  """Where the pixel is located in a space from 0 to 1, typical the index normalized on total length"""
+  pos: float
+
+TimeColorFunction = Callable[Concatenate[TickData, ...], Color]
 #TODO figure out how to replace ... with [LuxContext, ...]
-RegistryFunction = Callable[..., TimeColorFunction]
+x = collections.abc
+RegistryFunction = Callable[Concatenate[LuxContext, ...], Coroutine[Any, Any, None]]
 
-class InstructionRegistry(dict[str, RegistryFunction]):
+@dataclass
+class RegistryInstructionMetadata:
+  func: RegistryFunction
+  # TODO review, not sure that this feels correct, should parsers be set at start?
+  param_parsers: list[ParseFunc] = field(default_factory=lambda: [])
+
+class InstructionRegistry(dict[str, RegistryInstructionMetadata]):
   """
   Used to store how instructions map to functionality.
   Given a key (instruction identifier), map to a something that is used by other parts of the app
   """
-  pass
 
 if __name__ == "__main__":
   # reg = InstructionRegistry()

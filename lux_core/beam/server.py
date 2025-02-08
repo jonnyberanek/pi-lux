@@ -1,4 +1,5 @@
 import asyncio
+from ctypes import c_ubyte
 from typing import Callable
 
 from lux_core.beam.core import BeamException, Instruction
@@ -21,8 +22,8 @@ def parse_instruction(text: str):
   command, *parameters = text.split(":", 1)
   return Instruction(command, [] if len(parameters) == 0 else parameters[0].split(";"))
 
-def res_code(b: int):
-  return b.to_bytes(1, 'big')
+def res_code(b: c_ubyte | int):
+  return int(b).to_bytes(1, 'big')
 
 logger = get_logger("beam_server")
 
@@ -88,8 +89,8 @@ async def create_beam_server(handle_instructions: Callable[[list[Instruction]], 
 
   return server
 
-async def main(server: asyncio.Server):
-  async with create_beam_server(lambda i: None):
+async def main():
+  async with await create_beam_server(lambda i: None) as server:
     await server.serve_forever()
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from collections import namedtuple
 from typing import NamedTuple, Tuple, Union
 
-ColorVector = Tuple[int, int, int]
+ColorVector = tuple[int, int, int]
 
 def clamp(value: int, lower: int, upper: int) -> int:
   return max(min(value, upper), lower)
@@ -44,4 +44,4 @@ class Color(namedtuple('Color', 'r g b'), ColorVector):
   
 
 def rgb_to_rbg(color: Color) -> ColorVector: 
-  return tuple(color.r, color.b. color.g)
+  return ColorVector((color.r, color.b, color.g))

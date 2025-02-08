@@ -10,7 +10,7 @@ class DataEvent(asyncio.Event, Generic[T]):
   it can be consumed. This is expected, this should be used in a realtime
   system, prefer `asyncio.Queue` otherwise.
   """
-  data: Union[T | None] = None
+  data: Union[T, None] = None
 
   def setWithValue(self, value: T):
     self.data = value
@@ -22,4 +22,6 @@ class DataEvent(asyncio.Event, Generic[T]):
   
   async def waitForValue(self) -> T:
     await super().wait()
+    if self.data is None:
+      raise RuntimeError("Something went seriously wrong")
     return self.data

@@ -1,10 +1,11 @@
 import asyncio 
 from lux_core.beam.core import Instruction
 
-def instruction_to_bytes(instruction: Instruction) -> str:
+def instruction_to_bytes(instruction: Instruction) -> bytes:
   string = instruction.id
   if len(instruction.parameters) > 0:
-    string += ":" + ";".join(instruction.parameters) + ";;"
+    ps = ";".join([str(p) for p in instruction.parameters])
+    string += ":" + ps + ";;"
   return string.encode()
     
 class BeamClient:
