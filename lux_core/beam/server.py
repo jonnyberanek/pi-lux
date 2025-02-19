@@ -2,10 +2,10 @@ import asyncio
 from ctypes import c_ubyte
 from typing import Callable
 
-from lux_core.beam.core import BeamException, Instruction
+from lux_core.beam.core import BeamException, Instruction, RawInstruction
 from lux_core.logging import init_logging, get_logger
 
-def parse_data(data: str) -> list[Instruction]:
+def parse_data(data: str) -> list[RawInstruction]:
   """
   Parses data and returns the list of instructions.
   
@@ -13,21 +13,23 @@ def parse_data(data: str) -> list[Instruction]:
   the packet, since we'll discard out-of-date instructions anyways. Convention
   is kept for the sake of expandability in the future.
   """
-  return [parse_instruction(i) for i in data.strip().rstrip(";;").split(";;")[-1:]]
+  return [parse_instruction([i for i in data.strip().rstrip(";;").split(";;")][-1])]
 
 def parse_instruction(text: str):
   text = text.strip().rstrip(";")
   if len(text) == 0:
     raise ValueError("Instruction cannot be empty")
   command, *parameters = text.split(":", 1)
-  return Instruction(command, [] if len(parameters) == 0 else parameters[0].split(";"))
+  return RawInstruction(command, [] if len(parameters) == 0 else parameters[0].split(";"))
 
 def res_code(b: c_ubyte | int):
   return int(b).to_bytes(1, 'big')
 
 logger = get_logger("beam_server")
 
-def create_beam_handler(on_instructions_parsed: Callable[[list[Instruction]], None]):
+type OnInstructionParsedHandler = Callable[[list[RawInstruction]], None]
+
+def create_beam_handler(on_instructions_parsed: OnInstructionParsedHandler):
 
   async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
     peer = None
@@ -79,7 +81,7 @@ port = 8888
 server_ready_event = asyncio.Event()
 
 
-async def create_beam_server(handle_instructions: Callable[[list[Instruction]], None]):
+async def create_beam_server(handle_instructions: OnInstructionParsedHandler):
   handler = create_beam_handler(handle_instructions)
 
   server =  await asyncio.start_server(handler, ip, port)

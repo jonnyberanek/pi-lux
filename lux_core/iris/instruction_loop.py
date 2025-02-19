@@ -19,21 +19,13 @@ from lux_core.display import Display
 from lux_core.nonopt.framerate_rectifier import FramerateRectifier
 from lux_core.iris.instruction_registry import InstructionRegistry, RegistryInstructionMetadata, TimeColorFunction
 
-
-  
-# FIXME
-app_context: LuxContext
-
-# TODO should this be either or? Raw or non?
-class ReceivedInstructionEvent(DataEvent[Instruction]):
+class ReceivedInstructionEvent(DataEvent[RawInstruction]):
   pass
 
 # FIXME
 interval = 5.0
 
-reg = InstructionRegistry()
-
-def create_instruction_loop():
+def create_instruction_loop(registry: InstructionRegistry, context: LuxContext):
   event = ReceivedInstructionEvent()
   
   logger = get_logger("instr_reader")
@@ -47,7 +39,7 @@ def create_instruction_loop():
         exc_info=task.exception()
       )
     else:
-      logger.debug(f"{task.get_name()}: Task was success??")
+      logger.debug(f"{task.get_name()}: Task successful")
 
   async def run_loop(): 
     logger.info("Ready to receive events...")
@@ -61,10 +53,10 @@ def create_instruction_loop():
       # Event was consumed, clear and continue
       event.clear()
 
-      i_reg = reg.get(data.id)
+      i_reg = registry.get(data.id)
 
       if i_reg is None:
-        logger.warning(f"Could not find instruction with id '{data.id!r}'. Ignoring received event..")
+        logger.warning(f"Could not find instruction with id '{data.id}'. Ignoring received event..")
         continue
       
       i_fn = i_reg.func
@@ -75,7 +67,7 @@ def create_instruction_loop():
         task.cancel()
     
 
-      task = ensure_future(i_fn(app_context, *params))
+      task = ensure_future(i_fn(context, *params))
       task.set_name(f"{data.id}_task-{time.time_ns()}")
       task.add_done_callback(listen_to_task)
 
@@ -85,10 +77,12 @@ if __name__ == "__main__":
   from lux_core.logging import init_logging
   init_logging()
 
-  app_context = LuxContext(
+  context = LuxContext(
     display=PixelGuiDisplay(20),
     debug_display=True
   )
+
+  reg = InstructionRegistry()
 
   reg["rwheel"] = RegistryInstructionMetadata(
     rainbow_wheel_instr,
@@ -101,28 +95,33 @@ if __name__ == "__main__":
   )
 
   async def main():
-
-    (loop, event) = create_instruction_loop()
+    # """
+    # TODO: should loop take instructions? Or just converts instructions to tasks/coros outside of the loop and use them
+    # A consideration for keeping instruciton parsing in the loop is for backpressure: if we are sent 100 instr/s and can only
+    #   process 1 instr/s, then keep work in the loop stops us from parsing all of the "dropped" instructions that never even
+    # needed parsed in the first place.
+    # """
+    (loop, event) = create_instruction_loop(reg, context)
 
     ensure_future(loop())
 
     await sleep(0.5)
 
-    event.setWithValue(Instruction("fill", ['012345']))
+    event.setWithValue(RawInstruction("fill", ['012345']))
 
     await sleep(0.5)
 
-    event.setWithValue(Instruction("fill", ['ff00ff']))
+    event.setWithValue(RawInstruction("fill", ['ff00ff']))
     
-    event.setWithValue(Instruction("rwheel"))
+    event.setWithValue(RawInstruction("rwheel"))
 
     await sleep(3)
 
-    event.setWithValue(Instruction("clear"))
+    event.setWithValue(RawInstruction("clear"))
 
     await sleep(2)
 
-    event.setWithValue(Instruction("rwheel", ['5.0', '123']))
+    event.setWithValue(RawInstruction("rwheel", ['5.0', '123']))
 
     while True:
       await sleep(0.1)
