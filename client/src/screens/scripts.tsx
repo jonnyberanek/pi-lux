@@ -3,25 +3,25 @@ import { FC, useEffect, useState } from 'react'
 import { getScriptsInDir, runScript } from '../api'
 import './scripts.css'
 
-export interface ScriptsScreenProps extends RouteComponentProps {}
+export interface ScriptsScreenProps { }
 
 const ScriptsScreen: FC<ScriptsScreenProps> = () => {
-  const [scriptData, setScriptData] = useState<{name: string, argSchema: any}[] | string>()
+  // const [scriptData, setScriptData] = useState<{name: string, argSchema: any}[] | string>()
 
-  useEffect(() => {
-    getScriptsInDir()
-      .then(list => {
-        setScriptData(list)
-      })
-      .catch(e => {
-        console.warn(e.stack)
-        setScriptData(e.message)
-      })
-  }, [])
+  // useEffect(() => {
+  //   getScriptsInDir()
+  //     .then(list => {
+  //       setScriptData(list)
+  //     })
+  //     .catch(e => {
+  //       console.warn(e.stack)
+  //       setScriptData(e.message)
+  //     })
+  // }, [])
 
   return (
     <div className="container">
-      {!scriptData ? (
+      {/* {!scriptData ? (
         <div>Loading...</div>
       ) : typeof scriptData === 'string' ? (
         <div style={{ color: 'red' }}>Error: {scriptData}</div>
@@ -36,7 +36,7 @@ const ScriptsScreen: FC<ScriptsScreenProps> = () => {
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   )
 }

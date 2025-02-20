@@ -1,14 +1,19 @@
-import { Router } from '@reach/router'
-import ScriptsScreen from '../screens/scripts'
-import SliderScreen from '../screens/slider'
+import { createBrowserRouter } from 'react-router'
+import App from 'src/App'
+import ScriptsScreen from 'src/screens/scripts.tsx'
+import SliderScreen from 'src/screens/slider.tsx'
 
-const BaseRouter = ({}) => {
-  return (
-    <Router>
-      <SliderScreen path="slider" />
-      <ScriptsScreen path="scripts" />
-    </Router>
-  )
-}
+export const routes = [
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      { index: true, path: 'slider', element: <SliderScreen /> },
+      { path: 'scripts', element: <ScriptsScreen /> }
+    ]
+  }
+]
 
-export default BaseRouter
+const browserRouter = createBrowserRouter(routes)
+
+export default browserRouter

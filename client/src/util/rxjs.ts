@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Subject } from 'rxjs'
+import { useCallback, useEffect, useState } from 'react'
+import { BehaviorSubject, Observable, Subject } from 'rxjs'
 
 export function useObservableValue<O, V = O>(
   subject: Subject<O>,
@@ -20,3 +20,27 @@ export function useObservableValue<O, V = O>(
 
   return value
 }
+
+export function useSubject<V>(
+  subject: BehaviorSubject<V>,
+) {
+  const [value, setValue] = useState(subject.value)
+
+  useEffect(() => {
+    const sub = subject.subscribe({
+      next: value => {
+        setValue(value)
+      },
+    })
+    return () => sub.unsubscribe()
+  }, [subject])
+
+  // const setNext = useCallback(, [subject, subject.value])
+
+  const setNext = (fn: (current: V) => V) => {
+    subject.next(fn(subject.value))
+  }
+
+  return [value, setNext] as const
+}
+

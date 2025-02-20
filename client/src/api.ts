@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { RgbColor } from './RgbSlider'
+import { RgbColor } from './HsvColorInput'
 
 const piDev = true
 
@@ -8,13 +8,13 @@ const URL =
     ? 'http://localhost:4061'
     : 'http://192.168.0.175:4061'
 
-    // Mocked currently
+// Mocked currently
 export async function getScriptsInDir() {
   return axios.get(URL + '/scripts').then(({ data }) => data)
 }
 
 export async function runScript(name: string) {
-  return axios.post(`${URL}/scripts/${name.slice(0, name.length-3)}/run`, {})
+  return axios.post(`${URL}/scripts/${name.slice(0, name.length - 3)}/run`, {})
 }
 
 export async function setColor(c: RgbColor) {

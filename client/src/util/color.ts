@@ -1,10 +1,9 @@
-import Color from 'color'
+import { ColorResult } from '@uiw/color-convert'
 
-export function makeFilter(color: Color) {
-  const brightness = (Math.max(...color.rgb().array()) / 255) * 75
-  return `sepia(100%) 
-    saturate(${(380 * color.saturationv()) / 100}%) 
-    hue-rotate(${300 + color.hue()}deg) 
-    brightness(${brightness + 75}%)
+export function makeFilter({ hsv: { h, s, v } }: ColorResult) {
+  return `sepia(100%)
+    saturate(${s * v / 33}%)
+    hue-rotate(${300 + h}deg)
+    brightness(${1 * v / 2 + 50}%)
     `
 }

@@ -1,67 +1,49 @@
-import Color from 'color'
-import { useCallback, useEffect } from 'react'
-import { throttleTime } from 'rxjs/operators'
-import { setColor } from './api'
-import './App.css'
-import logo from './assets/triangle.svg'
-import { colorSubject } from './RgbSlider'
-import BaseRouter from './routing/router'
-import TabBar from './routing/TabBar'
-import { makeFilter } from './util/color'
-import { useObservableValue } from './util/rxjs'
-
-const throttledColorSubject = colorSubject.pipe(
-  throttleTime(200, undefined, { leading: true, trailing: true })
-)
+import { color, hsvaToHex } from '@uiw/color-convert'
+import { useMemo } from 'react'
+import { Outlet } from 'react-router'
+import 'src/App.css'
+import logo from 'src/assets/triangle.svg'
+import { routes } from 'src/routing/router'
+import TabBar from 'src/routing/TabBar'
+import { stateSubject } from 'src/state'
+import { makeFilter } from 'src/util/color'
+import { useSubject } from 'src/util/rxjs'
+import { toCapitalCase } from 'src/util/string'
+import { useResolvedRoute } from './routing/utils'
 
 function App() {
-  const colorFn = useCallback(value => Color(value), [])
+  const [state] = useSubject(stateSubject)
 
-  const color = useObservableValue(
-    colorSubject,
-    colorFn,
-    Color(colorSubject.value)
-  ) as Color
+  const children = useResolvedRoute(routes).route.children
+  const tabs = useMemo(() => {
+    return children!!.map(c => ({
+      path: c.path!!,
+      label: toCapitalCase(c.path ?? "index")
+    }))
+  }, [children])
 
-  useEffect(() => {
-    const sub = throttledColorSubject.subscribe({
-      next: setColor,
-    })
-    return () => sub.unsubscribe()
-  })
-
-  const tabs = [
-    {
-      label: 'Solid',
-      path: 'slider',
-    },
-    {
-      label: 'Scripts',
-      path: 'scripts',
-    },
-  ]
+  const c = { ...color(state.color).hsva }
+  c.s = c.s * c.v / 100
+  c.v = c.v / 8 + 10
 
   return (
-    <div className="App">
-      <header
-        className="App-header"
+    <div
+      className="content"
+      style={{
+        backgroundColor: hsvaToHex(c)
+      }}
+    >
+      <img
+        src={logo}
+        className="logo"
+        alt="logo"
         style={{
-          filter: makeFilter(color),
+          marginBottom: 10,
+          filter: makeFilter(color(state.color)),
         }}
-      >
-        <img
-          src={logo}
-          className="App-logo"
-          alt="logo"
-          style={{
-            marginBottom: 10,
-          }}
-        />
-        <br />
-        <TabBar tabs={tabs} />
-        <br />
-        <BaseRouter />
-      </header>
+      />
+      <TabBar className='nav-tabs' tabs={tabs} />
+      <Outlet />
     </div>
   )
 }

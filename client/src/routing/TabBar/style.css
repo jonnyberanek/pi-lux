@@ -1,0 +1,20 @@
+a {
+  color: gray;
+  padding: 1rem;
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+  background-color: #333;
+  border-radius: 0.25rem;
+}
+
+a:not(:last-child) {
+  margin-right: .5rem;
+}
+
+a.active {
+  color: white;
+}
+
+a:hover {
+  color: lightgray;
+}

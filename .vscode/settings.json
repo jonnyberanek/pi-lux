@@ -1,0 +1,9 @@
+{
+  "python.terminal.activateEnvironment": false,
+  "terminal.integrated.profiles.windows": {
+    "Python Env (Bash)": {
+      "source": "Git Bash",
+      "args": ["--rcfile", "${workspaceFolder}/env/Scripts/activate"]
+    }
+  }
+}
