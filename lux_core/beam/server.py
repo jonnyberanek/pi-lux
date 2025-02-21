@@ -1,6 +1,10 @@
 import asyncio
 from ctypes import c_ubyte
+import socket
 from typing import Callable
+import websockets
+import websockets.asyncio
+import websockets.asyncio.server
 
 from lux_core.beam.core import BeamException, Instruction, RawInstruction
 from lux_core.logging import init_logging, get_logger
@@ -13,10 +17,14 @@ def parse_data(data: str) -> list[RawInstruction]:
   the packet, since we'll discard out-of-date instructions anyways. Convention
   is kept for the sake of expandability in the future.
   """
+  print(data)
+  print([i for i in data.strip().rstrip(";;").split(";;")])
   return [parse_instruction([i for i in data.strip().rstrip(";;").split(";;")][-1])]
 
 def parse_instruction(text: str):
+  print(text)
   text = text.strip().rstrip(";")
+  print(text)
   if len(text) == 0:
     raise ValueError("Instruction cannot be empty")
   command, *parameters = text.split(":", 1)
@@ -75,23 +83,42 @@ def create_beam_handler(on_instructions_parsed: OnInstructionParsedHandler):
   return handle
 
 ip = '0.0.0.0'
-port = 8888
+port = 4061
 
 # HACK Will fix, but theoretically would never be problematic
 server_ready_event = asyncio.Event()
 
-
 async def create_beam_server(handle_instructions: OnInstructionParsedHandler):
-  handler = create_beam_handler(handle_instructions)
 
-  server =  await asyncio.start_server(handler, ip, port)
+  async def handler(websocket: websockets.ServerConnection):
+    async for message in websocket:
+        try:
+          logger.debug(f"received {message!r}")
+          handle_instructions(parse_data(message))
+          await websocket.send("")
+        except websockets.exceptions.ConnectionClosedOK:
+          pass
 
-  addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
-  logger.info(f'Serving on {addrs}')
+  # handler = create_beam_handler(handle_instructions)
+
+  # server =  await asyncio.start_server(handler, ip, port)
+  server = await websockets.asyncio.server.serve(handler, ip, port)
+
+  s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+  s.connect(("8.8.8.8", 80))
+  logger.info(f'Listening on on {s.getsockname()[0]}:{port}')
+  s.close()
 
   return server
 
+
 async def main():
+
+  # async with websockets.asyncio.server.serve(handler, "localhost", port):
+  #       print(f"WebSocket server started on ws://{ip}:{port}")
+  #       await asyncio.Future()  # Run forever
+
+
   async with await create_beam_server(lambda i: None) as server:
     await server.serve_forever()
 

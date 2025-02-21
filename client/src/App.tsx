@@ -1,5 +1,5 @@
 import { color, hsvaToHex } from '@uiw/color-convert'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Outlet } from 'react-router'
 import 'src/App.css'
 import logo from 'src/assets/triangle.svg'
@@ -10,9 +10,21 @@ import { makeFilter } from 'src/util/color'
 import { useSubject } from 'src/util/rxjs'
 import { toCapitalCase } from 'src/util/string'
 import { useResolvedRoute } from './routing/utils'
+import { setColor } from './api'
+
+const ws = new WebSocket('ws://localhost:4061')
 
 function App() {
   const [state] = useSubject(stateSubject)
+
+  useEffect(() => {
+    console.log("set color")
+    setColor(ws, hsvaToHex(state.color).slice(1))
+    // return () => {
+    //   console.log("unsub")
+    //   thing.unsubscribe()
+    // }
+  }, [state.color])
 
   const children = useResolvedRoute(routes).route.children
   const tabs = useMemo(() => {

@@ -1,4 +1,5 @@
 import asyncio
+from logging import ERROR
 from typing import Generic, TypeVar, Union
 from lux_core.animations import boot_sequence
 from lux_core.beam.core import Instruction
@@ -14,7 +15,7 @@ from lux_core.nonopt.framerate_rectifier import FramerateRectifier
 from lux_core.animations.rainbow_wheel import rainbow_wheel_instr, clear, fill
 
 if __name__ == "__main__":
-  init_logging()
+  init_logging(ERROR)
 
 logger = get_logger(__name__)
 

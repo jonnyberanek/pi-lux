@@ -1,28 +1,23 @@
 import axios from 'axios'
-import { RgbColor } from './HsvColorInput'
+import { tap } from 'rxjs'
+import { webSocket } from 'rxjs/webSocket'
 
-const piDev = true
+const piDev = false
 
-const URL =
-  process.env.NODE_ENV === 'development' && !piDev
-    ? 'http://localhost:4061'
-    : 'http://192.168.0.175:4061'
+const URL = 'ws://localhost:4061'
+// process.env.NODE_ENV === 'development' && !piDev
+//   ? 'ws://localhost:4061'
+//   : 'ws://192.168.0.175:4061'
 
-// Mocked currently
-export async function getScriptsInDir() {
-  return axios.get(URL + '/scripts').then(({ data }) => data)
-}
+export function setColor(ws: WebSocket, color: string) {
+  // const socketSubject = webSocket(URL)
 
-export async function runScript(name: string) {
-  return axios.post(`${URL}/scripts/${name.slice(0, name.length - 3)}/run`, {})
-}
-
-export async function setColor(c: RgbColor) {
-  try {
-    await axios.post('http://192.168.0.175:4061/testnet', {
-      color: [c[0], c[2], c[1]],
-    })
-  } catch (e) {
-    console.log(e.request, e.response)
+  if (ws.readyState == WebSocket.OPEN) {
+    ws.send(`fill:${color};;`)
   }
+
+  // socketSubject.next("fill:00ff00;;")
+  // return socketSubject.pipe(
+  // tap(console.log)
+  // )
 }

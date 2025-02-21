@@ -1,4 +1,6 @@
-import asyncio 
+import asyncio
+
+from websockets import connect 
 from lux_core.beam.core import Instruction
 
 def instruction_to_bytes(instruction: Instruction) -> bytes:
@@ -25,10 +27,25 @@ class BeamClient:
     await self.writer.drain()
     return await self.reader.read(1)
 
-async def main():
-  async with BeamClient(('localhost', 8888)) as client:
-    print(await client.send_instruction(Instruction('fill', ['ff00ff'])))
-    print(await client.send_instruction(Instruction('fill', ['ffff00'])))
+# async def main():
+#   async with BeamClient(('localhost', 8888)) as client:
+#     print(await client.send_instruction(Instruction('fill', ['ff00ff'])))
+#     print(await client.send_instruction(Instruction('fill', ['ffff00'])))
+
+# if __name__ == "__main__":
+#   asyncio.run(main())
+
+async def hello():
+    async with connect("ws://localhost:8888") as websocket:
+        await websocket.send("fill:00ff00;;")
+        message = await websocket.recv()
+        print(message)
+
+        await websocket.send("fill:00ff00;;")
+        await websocket.send("fill:00fff0;;")
+        message = await websocket.recv()
+        print(message)
+
 
 if __name__ == "__main__":
-  asyncio.run(main())
+    asyncio.run(hello())
