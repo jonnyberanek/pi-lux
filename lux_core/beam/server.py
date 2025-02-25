@@ -1,7 +1,7 @@
 import asyncio
 from ctypes import c_ubyte
 import socket
-from typing import Callable
+from typing import Any, Callable
 import websockets
 import websockets.asyncio
 import websockets.asyncio.server
@@ -17,14 +17,10 @@ def parse_data(data: str) -> list[RawInstruction]:
   the packet, since we'll discard out-of-date instructions anyways. Convention
   is kept for the sake of expandability in the future.
   """
-  print(data)
-  print([i for i in data.strip().rstrip(";;").split(";;")])
   return [parse_instruction([i for i in data.strip().rstrip(";;").split(";;")][-1])]
 
 def parse_instruction(text: str):
-  print(text)
   text = text.strip().rstrip(";")
-  print(text)
   if len(text) == 0:
     raise ValueError("Instruction cannot be empty")
   command, *parameters = text.split(":", 1)
@@ -35,7 +31,8 @@ def res_code(b: c_ubyte | int):
 
 logger = get_logger("beam_server")
 
-type OnInstructionParsedHandler = Callable[[list[RawInstruction]], None]
+type Result = Any
+type OnInstructionParsedHandler = Callable[[list[RawInstruction]], Result]
 
 def create_beam_handler(on_instructions_parsed: OnInstructionParsedHandler):
 
@@ -94,10 +91,13 @@ async def create_beam_server(handle_instructions: OnInstructionParsedHandler):
     async for message in websocket:
         try:
           logger.debug(f"received {message!r}")
-          handle_instructions(parse_data(message))
-          await websocket.send("")
+          res = handle_instructions(parse_data(str(message)))
+          await websocket.send(str(res))
         except websockets.exceptions.ConnectionClosedOK:
           pass
+        except Exception as e:
+          logger.error(e)
+          await websocket.close(1011)
 
   # handler = create_beam_handler(handle_instructions)
 

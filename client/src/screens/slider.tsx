@@ -1,18 +1,19 @@
 import * as React from 'react'
+import { WsClient } from 'src/api'
 import HsvColorInput, { HsvColorInputProps } from '../HsvColorInput'
-import { useSubject } from '../util/rxjs'
 import { stateSubject } from '../state'
-import { matchRoutes, useLocation, useMatch, useMatches, useResolvedPath } from 'react-router'
-import { routes } from 'src/routing/router'
-import { useResolvedRoute } from 'src/routing/utils'
+import { useSubject } from '../util/rxjs'
 
 export interface SliderScreenProps { }
 
 const SliderScreen: React.FC<SliderScreenProps> = () => {
   const [state, setNext] = useSubject(stateSubject)
 
+  const wsClient = React.useRef<WsClient>(new WsClient()).current
+
   const handleColorChange: HsvColorInputProps['onChange'] = color => {
     setNext(curr => ({ ...curr, color }))
+    wsClient.setFill(color)
   }
 
   return (
