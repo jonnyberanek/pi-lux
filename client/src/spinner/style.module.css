@@ -1,0 +1,19 @@
+@keyframes loader-spin {
+  from {
+    transform: rotate(-30deg);
+  }
+  to {
+    transform: rotate(330deg);
+  }
+}
+
+.container {
+  line-height: 0;
+}
+
+.loader {
+  display: inline-block;
+  color: white;
+  fill: dimgray;
+  animation: loader-spin 1s cubic-bezier(.65,0,.35,1) infinite;
+}

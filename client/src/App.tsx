@@ -1,5 +1,5 @@
 import { color, hsvaToHex } from '@uiw/color-convert'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Outlet } from 'react-router'
 import 'src/App.css'
 import logo from 'src/assets/triangle.svg'
@@ -10,6 +10,8 @@ import { makeFilter } from 'src/util/color'
 import { useSubject } from 'src/util/rxjs'
 import { toCapitalCase } from 'src/util/string'
 import { useResolvedRoute } from './routing/utils'
+import React from 'react'
+import { WsClient } from './network/api'
 
 function App() {
   const [state] = useSubject(stateSubject)

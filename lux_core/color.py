@@ -42,6 +42,9 @@ class Color(namedtuple('Color', 'r g b'), ColorVector):
   def toHex(self, prefix="#"):
     return f'{prefix}%02x%02x%02x' % self
   
+def color_from_hex(hx: str) -> Color:
+    h = int(hx, 16)
+    return Color(h >> 16 & 0xFF, h >> 8 & 0xFF, h & 0xFF)
 
 def rgb_to_rbg(color: Color) -> ColorVector: 
   return ColorVector((color.r, color.b, color.g))

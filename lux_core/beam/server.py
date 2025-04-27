@@ -1,21 +1,26 @@
 import asyncio
 from ctypes import c_ubyte
+import itertools
+import json
 import socket
-from typing import Any, Callable
+from typing import Any, Callable, Sequence
 import websockets
 import websockets.asyncio
 import websockets.asyncio.server
 
-from lux_core.beam.core import BeamException, Instruction, RawInstruction
-from lux_core.logging import init_logging, get_logger
+from lux_core.beam.core import BeamException, Instruction, RawInstruction, BeamRequest, res_code
+from lux_core.beam.protocols.dfp_handler import DfpProtocolHandler
+from lux_core.beam.protocols.handler import ProtocolHandler
+from lux_core.beam.protocols.pfp_handler import PfpProtocolHandler
+from lux_core.logger import VERBOSE, init_logging, get_logger
 
-def parse_data(data: str) -> list[RawInstruction]:
+def parse_data(data: str) -> list[BeamRequest]:
   """
   Parses data and returns the list of instructions.
   
   Despite this, internally this is optimzed only parse the last instruction in
-  the packet, since we'll discard out-of-date instructions anyways. Convention
-  is kept for the sake of expandability in the future.
+  the packet, since we'll discard out-of-date instructions anyways. May replace
+  but convention is intended for expandability in the future.
   """
   return [parse_instruction([i for i in data.strip().rstrip(";;").split(";;")][-1])]
 
@@ -24,17 +29,16 @@ def parse_instruction(text: str):
   if len(text) == 0:
     raise ValueError("Instruction cannot be empty")
   command, *parameters = text.split(":", 1)
-  return RawInstruction(command, [] if len(parameters) == 0 else parameters[0].split(";"))
+  return BeamRequest(command, [] if len(parameters) == 0 else parameters[0].split(";"))
 
-def res_code(b: c_ubyte | int):
-  return int(b).to_bytes(1, 'big')
+
 
 logger = get_logger("beam_server")
 
 type Result = Any
-type OnInstructionParsedHandler = Callable[[list[RawInstruction]], Result]
+type OnRequestParsedHandler = Callable[[list[BeamRequest]], Result]
 
-def create_beam_handler(on_instructions_parsed: OnInstructionParsedHandler):
+def create_beam_handler(on_instructions_parsed: OnRequestParsedHandler):
 
   async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
     peer = None
@@ -85,24 +89,51 @@ port = 4061
 # HACK Will fix, but theoretically would never be problematic
 server_ready_event = asyncio.Event()
 
-async def create_beam_server(handle_instructions: OnInstructionParsedHandler):
+PFP = "pfp"
+DFP = "dfp"
+
+async def create_beam_server(
+    dfp_handler: ProtocolHandler,
+    pfp_handler: ProtocolHandler
+):
+  
 
   async def handler(websocket: websockets.ServerConnection):
     async for message in websocket:
+        protocol_handler = dfp_handler if websocket.subprotocol == DFP else pfp_handler
+
         try:
-          logger.debug(f"received {message!r}")
-          res = handle_instructions(parse_data(str(message)))
-          await websocket.send(str(res))
+          logger.debug(f"received {message!r} from {websocket.id}")
+          requests = parse_data(str(message))
+
+          logger.debug(f"handling {requests}")
+
+          await websocket.send(protocol_handler.handle_requests(requests))
+          # await websocket.send(res_code(0))
+          # return
+
+          # res = handle_instructions(parse_data(str(message)))
+
+          # await websocket.send(str(res))
         except websockets.exceptions.ConnectionClosedOK:
-          pass
+          logger.debug("Connection closed by client")
+        except BeamException as e:
+          logger.info(f"BeamException: {e!r}")
+          await websocket.send(protocol_handler.handle_exception(e))
+          await websocket.close(1011)
         except Exception as e:
-          logger.error(e)
+          logger.error(e, exc_info=True)
           await websocket.close(1011)
 
   # handler = create_beam_handler(handle_instructions)
 
+  def select_subprotocol(connection: websockets.ServerConnection, subprotocols:  Sequence[websockets.Subprotocol]) -> websockets.Subprotocol | None:
+    if 'dfp' in subprotocols:
+      return DFP
+    return PFP
+
   # server =  await asyncio.start_server(handler, ip, port)
-  server = await websockets.asyncio.server.serve(handler, ip, port)
+  server = await websockets.asyncio.server.serve(handler, ip, port, select_subprotocol=select_subprotocol)
 
   s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
   s.connect(("8.8.8.8", 80))
@@ -118,8 +149,10 @@ async def main():
   #       print(f"WebSocket server started on ws://{ip}:{port}")
   #       await asyncio.Future()  # Run forever
 
-
-  async with await create_beam_server(lambda i: None) as server:
+  async with await create_beam_server(
+    DfpProtocolHandler(lambda x: None),
+    PfpProtocolHandler(lambda x: None)
+  ) as server:
     await server.serve_forever()
 
 if __name__ == "__main__":

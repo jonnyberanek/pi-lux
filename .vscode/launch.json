@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "name": "Python Debugger: As Module",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "lux_core.${fileBasenameNoExtension}"
+    },
+    {
+      "name": "Python: As Module",
+      "type": "python",
+      "request": "launch",
+      "module": "lux_core.${fileBasenameNoExtension}"
+    }
+  ]
+}

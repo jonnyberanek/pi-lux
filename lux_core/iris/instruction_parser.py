@@ -21,3 +21,13 @@ def parse_params(params: list[str], parse_map: list[ParseFunc]):
   """
   #[:len(params)] is to allow for default values to be possible when nothing provided
   return [parse(params[i].strip()) for i, parse in enumerate(parse_map[:len(params)])]
+
+def get_parse_type_name(fn: ParseFunc):
+  return_type = fn
+  if type(return_type) is not type:
+    if 'return' not in fn.__annotations__:
+      raise ValueError("Parse function must be a type constructor or have an annotated return type.")
+    return_type = fn.__annotations__['return']
+  
+  # return return_type.__module__ + "." + return_type.__name__
+  return return_type.__name__

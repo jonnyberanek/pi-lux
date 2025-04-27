@@ -1,6 +1,6 @@
 import asyncio
 
-from websockets import connect 
+from websockets import Subprotocol, connect 
 from lux_core.beam.core import Instruction
 
 def instruction_to_bytes(instruction: Instruction) -> bytes:
@@ -36,15 +36,16 @@ class BeamClient:
 #   asyncio.run(main())
 
 async def hello():
-    async with connect("ws://localhost:8888") as websocket:
-        await websocket.send("fill:00ff00;;")
-        message = await websocket.recv()
-        print(message)
+    async with connect("ws://localhost:4061", subprotocols=['dfp'] ) as websocket:
+      # await websocket.send("!list_instructions;;")
+      # print(await websocket.recv())
+        # await websocket.send("fill:00ff00;;")
+        # message = await websocket.recv()
+        # print(message)
 
-        await websocket.send("fill:00ff00;;")
-        await websocket.send("fill:00fff0;;")
-        message = await websocket.recv()
-        print(message)
+      await websocket.send("fill:100ff00;;fill:200fff0;;!fill:300fff0;;!fill:400fff0;;")
+      message = await websocket.recv()
+      print(f"{message!r}")
 
 
 if __name__ == "__main__":

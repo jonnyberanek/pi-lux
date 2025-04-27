@@ -6,20 +6,20 @@ import time
 import traceback
 from typing import Callable, Union
 from lux_core.animations.rainbow_wheel import rainbow_wheel_instr, clear, fill
-from lux_core.beam.core import Instruction, RawInstruction
+from lux_core.beam.core import BeamRequest, Instruction, RawInstruction
 from lux_core.context import LuxContext
 from lux_core.diag.frame_counting import FrameCounterThread
 from lux_core.gui_display import PixelGuiDisplay
 from lux_core.iris.event import DataEvent
 from lux_core.iris.instruction_parser import parse_params
-from lux_core.logging import get_logger
+from lux_core.logger import get_logger
 
 from lux_core.color import Color
 from lux_core.display import Display
 from lux_core.nonopt.framerate_rectifier import FramerateRectifier
 from lux_core.iris.instruction_registry import InstructionRegistry, RegistryInstructionMetadata, TimeColorFunction
 
-class ReceivedInstructionEvent(DataEvent[RawInstruction]):
+class ReceivedInstructionEvent(DataEvent[BeamRequest]):
   pass
 
 # FIXME
@@ -29,6 +29,10 @@ def create_instruction_loop(registry: InstructionRegistry, context: LuxContext):
   event = ReceivedInstructionEvent()
   
   logger = get_logger("instr_reader")
+
+  def handle_command(request: BeamRequest):
+    if request.command == "!instructions":
+      pass
 
   def listen_to_task(task: Task):
     if task.cancelled():
@@ -40,6 +44,8 @@ def create_instruction_loop(registry: InstructionRegistry, context: LuxContext):
       )
     else:
       logger.debug(f"{task.get_name()}: Task successful")
+
+  
 
   async def run_loop(): 
     logger.info("Ready to receive events...")
@@ -53,10 +59,13 @@ def create_instruction_loop(registry: InstructionRegistry, context: LuxContext):
       # Event was consumed, clear and continue
       event.clear()
 
-      i_reg = registry.get(data.id)
+      if data.command == "!instructions":
+        print(i_reg)
+
+      i_reg = registry.get(data.command)
 
       if i_reg is None:
-        logger.warning(f"Could not find instruction with id '{data.id}'. Ignoring received event..")
+        logger.warning(f"Could not find instruction with id '{data.command}'. Ignoring received event..")
         continue
       
       i_fn = i_reg.func
@@ -64,17 +73,16 @@ def create_instruction_loop(registry: InstructionRegistry, context: LuxContext):
 
       if task is not None and not task.done():
         logger.debug("Cancelling previous task")
-        task.cancel()
-    
+        task.cancel()    
 
       task = ensure_future(i_fn(context, *params))
-      task.set_name(f"{data.id}_task-{time.time_ns()}")
+      task.set_name(f"{data.command}_task-{time.time_ns()}")
       task.add_done_callback(listen_to_task)
 
   return (run_loop, event)
 
 if __name__ == "__main__":
-  from lux_core.logging import init_logging
+  from lux_core.logger import init_logging
   init_logging()
 
   context = LuxContext(
@@ -94,7 +102,7 @@ if __name__ == "__main__":
     [Color.fromHexString]
   )
 
-  async def main():
+  async def main2():
     # """
     # TODO: should loop take instructions? Or just converts instructions to tasks/coros outside of the loop and use them
     # A consideration for keeping instruciton parsing in the loop is for backpressure: if we are sent 100 instr/s and can only
@@ -125,6 +133,16 @@ if __name__ == "__main__":
 
     while True:
       await sleep(0.1)
+
+  async def inner():
+    yield 1
+    await asyncio.sleep(2)
+    yield 2
+
+  async def main():
+    print("hi")
+    async for i in inner():
+      print(i)
 
   run(main())
   

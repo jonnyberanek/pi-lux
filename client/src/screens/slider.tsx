@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { WsClient } from 'src/api'
+import { WsClient } from 'src/network/api'
 import HsvColorInput, { HsvColorInputProps } from '../HsvColorInput'
 import { stateSubject } from '../state'
 import { useSubject } from '../util/rxjs'
