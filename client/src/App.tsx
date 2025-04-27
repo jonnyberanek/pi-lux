@@ -43,7 +43,7 @@ function App() {
           filter: makeFilter(color(state.color)),
         }}
       />
-      <TabBar className='nav-tabs' tabs={tabs} />
+      {/* <TabBar className='nav-tabs' tabs={tabs} /> */}
       <Outlet />
     </div>
   )

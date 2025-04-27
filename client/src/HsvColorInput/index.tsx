@@ -15,8 +15,12 @@ export type HsvColorInputProps =
 export default function HsvColorInput({ className, color, onChange }: HsvColorInputProps) {
   return (
     <div className={'rgbSlider' + (className ? ' ' + className : '')}>
-      <Wheel color={color} onChange={({ hsva }) => onChange({ ...color, ...hsva })} />
-      <ShadeSlider hsva={color} width={316} onChange={({ v }) => onChange({ ...color, v })} />
+      <Wheel className='wheel' style={{ width: 316, height: 316 }} color={color} onChange={({ hsva }) => onChange({ ...color, ...hsva })} />
+
+      <div className='slider-row'>
+        <button onClick={() => onChange({ ...color, v: 0 })}>Off</button>
+        <ShadeSlider className='slider' hsva={color} onChange={({ v }) => onChange({ ...color, v })} />
+      </div>
     </div>
   )
 }

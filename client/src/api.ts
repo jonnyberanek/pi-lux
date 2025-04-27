@@ -1,13 +1,13 @@
 import { HsvaColor, hsvaToHex } from '@uiw/color-convert'
 import { debounceTime, filter, map, ReplaySubject, Subject, throttleTime } from 'rxjs'
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket'
+import { ip, server_port } from 'src/../app.config.json'
 
-const piDev = false
+const URL = process.env.NODE_ENV === 'development'
+  ? `ws://localhost:${server_port}`
+  : `ws:///${ip}:${server_port}`
 
-const URL = 'ws://localhost:4061'
-// process.env.NODE_ENV === 'development' && !piDev
-//   ? 'ws://localhost:4061'
-//   : 'ws://192.168.0.175:4061'
+console.log(process.env.NODE_ENV, URL)
 
 export class WsClient {
 

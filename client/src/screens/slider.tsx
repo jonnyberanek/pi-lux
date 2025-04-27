@@ -12,6 +12,7 @@ const SliderScreen: React.FC<SliderScreenProps> = () => {
   const wsClient = React.useRef<WsClient>(new WsClient()).current
 
   const handleColorChange: HsvColorInputProps['onChange'] = color => {
+    console.log(color)
     setNext(curr => ({ ...curr, color }))
     wsClient.setFill(color)
   }

@@ -5,3 +5,29 @@
   align-items: center;
   justify-content: center;
 }
+/* 
+.wheel { 
+  width: 300px;
+  height: 300px;
+}
+*/
+.slider-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.slider {
+  margin-top: 1rem;
+  width: 300px;
+  border-radius: 4px;
+  margin-left: 1rem;
+}
+
+.slider:first-child {
+  border-radius: 10px;
+}
+
+.slider .w-color-interactive {
+  border-radius: 10px;
+}
